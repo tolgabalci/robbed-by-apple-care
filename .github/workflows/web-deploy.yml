@@ -1,0 +1,58 @@
+name: Deploy Web Application
+
+on:
+  push:
+    branches: [ main ]
+    paths: [ 'apps/web/**' ]
+  pull_request:
+    branches: [ main ]
+    paths: [ 'apps/web/**' ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: 'apps/web/package-lock.json'
+    
+    - name: Install dependencies
+      run: |
+        cd apps/web
+        npm ci
+    
+    - name: Run linting
+      run: |
+        cd apps/web
+        npm run lint
+    
+    - name: Run type checking
+      run: |
+        cd apps/web
+        npm run type-check
+    
+    - name: Run tests
+      run: |
+        cd apps/web
+        npm test -- --coverage --watchAll=false
+    
+    - name: Build application
+      run: |
+        cd apps/web
+        npm run build
+    
+    - name: Deploy to Azure Static Web Apps
+      if: github.ref == 'refs/heads/main'
+      uses: Azure/static-web-apps-deploy@v1
+      with:
+        azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        action: "upload"
+        app_location: "apps/web"
+        output_location: "out"

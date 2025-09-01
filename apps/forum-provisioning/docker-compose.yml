@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  discourse:
+    image: discourse/discourse:latest
+    container_name: discourse_app
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - discourse-data:/var/discourse
+      - ./app.yml:/var/discourse/containers/app.yml:ro
+      - ./logs:/var/discourse/shared/standalone/log
+    env_file:
+      - .env
+    environment:
+      - DISCOURSE_HOSTNAME=forum.robbedbyapplecare.com
+      - DISCOURSE_DEVELOPER_EMAILS=admin@robbedbyapplecare.com
+    depends_on:
+      - redis
+    networks:
+      - discourse-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/srv/status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  redis:
+    image: redis:7-alpine
+    container_name: discourse_redis
+    restart: unless-stopped
+    volumes:
+      - redis-data:/data
+    networks:
+      - discourse-network
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  discourse-data:
+    driver: local
+  redis-data:
+    driver: local
+
+networks:
+  discourse-network:
+    driver: bridge

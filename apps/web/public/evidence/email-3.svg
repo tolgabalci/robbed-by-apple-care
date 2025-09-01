@@ -1,0 +1,19 @@
+<svg width="640" height="480" xmlns="http://www.w3.org/2000/svg">
+  <rect width="100%" height="100%" fill="#f3f4f6"/>
+  <rect x="20" y="20" width="600" height="60" fill="#ffffff" stroke="#e5e7eb"/>
+  <text x="40" y="45" font-family="Arial, sans-serif" font-size="14" fill="#374151">From: noreply@apple.com</text>
+  <text x="40" y="65" font-family="Arial, sans-serif" font-size="14" fill="#374151">Subject: Case #12345 - Resolved and Closed</text>
+  
+  <rect x="20" y="100" width="600" height="300" fill="#ffffff" stroke="#e5e7eb"/>
+  <text x="40" y="130" font-family="Arial, sans-serif" font-size="12" fill="#6b7280">This is an automated message.</text>
+  <text x="40" y="170" font-family="Arial, sans-serif" font-size="12" fill="#6b7280">Your AppleCare case #12345 has been marked as resolved</text>
+  <text x="40" y="190" font-family="Arial, sans-serif" font-size="12" fill="#6b7280">and closed in our system.</text>
+  <text x="40" y="230" font-family="Arial, sans-serif" font-size="12" fill="#6b7280">If you believe this case was closed in error, please</text>
+  <text x="40" y="250" font-family="Arial, sans-serif" font-size="12" fill="#6b7280">contact AppleCare support to open a new case.</text>
+  <text x="40" y="290" font-family="Arial, sans-serif" font-size="12" fill="#6b7280">Case Number: #12345</text>
+  <text x="40" y="310" font-family="Arial, sans-serif" font-size="12" fill="#6b7280">Status: Closed</text>
+  <text x="40" y="330" font-family="Arial, sans-serif" font-size="12" fill="#6b7280">Resolution: Automatic Closure</text>
+  <text x="40" y="370" font-family="Arial, sans-serif" font-size="12" fill="#6b7280">AppleCare Automated System</text>
+  
+  <text x="320" y="460" font-family="Arial, sans-serif" font-size="10" fill="#9ca3af" text-anchor="middle">[PLACEHOLDER EMAIL SCREENSHOT]</text>
+</svg>

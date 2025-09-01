@@ -1,0 +1,519 @@
+name: Deploy Discourse Configuration
+
+on:
+  push:
+    branches: [ main ]
+    paths: [ 'apps/forum-provisioning/**' ]
+  pull_request:
+    branches: [ main ]
+    paths: [ 'apps/forum-provisioning/**' ]
+  workflow_dispatch:
+    inputs:
+      deployment_type:
+        description: 'Type of deployment'
+        required: true
+        default: 'config-update'
+        type: choice
+        options:
+          - config-update
+          - full-restart
+          - update-discourse
+          - emergency-restart
+      force_deployment:
+        description: 'Force deployment even if no changes detected'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  DISCOURSE_USER: "discourse"
+  DISCOURSE_DIR: "/var/discourse"
+  SSH_TIMEOUT: "300"
+
+jobs:
+  # Validate configuration files
+  validate-config:
+    name: Validate Configuration
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Validate shell scripts
+      run: |
+        echo "## Configuration Validation Results" >> $GITHUB_STEP_SUMMARY
+        
+        # Check shell script syntax
+        for script in apps/forum-provisioning/*.sh; do
+          if [ -f "$script" ]; then
+            echo "Validating $script..."
+            if bash -n "$script"; then
+              echo "✅ $script - Syntax OK" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "❌ $script - Syntax Error" >> $GITHUB_STEP_SUMMARY
+              exit 1
+            fi
+          fi
+        done
+    
+    - name: Validate Docker Compose
+      run: |
+        cd apps/forum-provisioning
+        if [ -f "docker-compose.yml" ]; then
+          echo "Validating docker-compose.yml..."
+          if docker-compose config >/dev/null 2>&1; then
+            echo "✅ docker-compose.yml - Valid" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ docker-compose.yml - Invalid" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+        fi
+    
+    - name: Validate Discourse app.yml
+      run: |
+        cd apps/forum-provisioning
+        if [ -f "app.yml" ]; then
+          echo "Validating app.yml..."
+          # Basic YAML syntax check
+          if python3 -c "import yaml; yaml.safe_load(open('app.yml'))" 2>/dev/null; then
+            echo "✅ app.yml - Valid YAML" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ app.yml - Invalid YAML" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+        fi
+
+  # Deploy to Discourse VM (only on main branch or manual trigger)
+  deploy-discourse:
+    name: Deploy to Discourse VM
+    runs-on: ubuntu-latest
+    needs: validate-config
+    if: |
+      (github.ref == 'refs/heads/main' && github.event_name == 'push') ||
+      github.event_name == 'workflow_dispatch'
+    environment: production
+    
+    outputs:
+      deployment_status: ${{ steps.deployment.outputs.status }}
+      vm_ip: ${{ steps.get_vm_info.outputs.vm_ip }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Azure CLI
+      uses: azure/CLI@v1
+      with:
+        azcliversion: 2.30.0
+        inlineScript: |
+          az --version
+    
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+    
+    - name: Get VM Information
+      id: get_vm_info
+      run: |
+        # Get VM IP from Terraform state or Azure resources
+        VM_IP=$(az vm list-ip-addresses \
+          --resource-group "${{ secrets.AZURE_RESOURCE_GROUP }}" \
+          --name "discourse-vm" \
+          --query "[0].virtualMachine.network.publicIpAddresses[0].ipAddress" \
+          --output tsv 2>/dev/null || echo "")
+        
+        if [ -z "$VM_IP" ]; then
+          echo "❌ Failed to get VM IP address"
+          exit 1
+        fi
+        
+        echo "vm_ip=$VM_IP" >> $GITHUB_OUTPUT
+        echo "VM IP: $VM_IP" >> $GITHUB_STEP_SUMMARY
+    
+    - name: Setup SSH Key
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.DISCOURSE_VM_SSH_KEY }}" > ~/.ssh/discourse_key
+        chmod 600 ~/.ssh/discourse_key
+        
+        # Add VM to known hosts
+        ssh-keyscan -H ${{ steps.get_vm_info.outputs.vm_ip }} >> ~/.ssh/known_hosts
+    
+    - name: Test SSH Connection
+      run: |
+        echo "Testing SSH connection to VM..."
+        if ssh -i ~/.ssh/discourse_key -o ConnectTimeout=30 -o StrictHostKeyChecking=no \
+           azureuser@${{ steps.get_vm_info.outputs.vm_ip }} "echo 'SSH connection successful'"; then
+          echo "✅ SSH connection established" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "❌ SSH connection failed" >> $GITHUB_STEP_SUMMARY
+          exit 1
+        fi
+    
+    - name: Upload Configuration Files
+      run: |
+        echo "Uploading configuration files to VM..."
+        
+        # Create temporary directory for deployment files
+        ssh -i ~/.ssh/discourse_key azureuser@${{ steps.get_vm_info.outputs.vm_ip }} \
+          "sudo mkdir -p /tmp/discourse-deploy && sudo chown azureuser:azureuser /tmp/discourse-deploy"
+        
+        # Upload all forum provisioning files
+        scp -i ~/.ssh/discourse_key -r apps/forum-provisioning/* \
+          azureuser@${{ steps.get_vm_info.outputs.vm_ip }}:/tmp/discourse-deploy/
+        
+        echo "✅ Configuration files uploaded" >> $GITHUB_STEP_SUMMARY
+    
+    - name: Deploy Configuration
+      id: deployment
+      run: |
+        echo "## Discourse Deployment Progress" >> $GITHUB_STEP_SUMMARY
+        
+        DEPLOYMENT_TYPE="${{ github.event.inputs.deployment_type || 'config-update' }}"
+        
+        # Execute deployment based on type
+        case "$DEPLOYMENT_TYPE" in
+          "config-update")
+            echo "Performing configuration update..."
+            ssh -i ~/.ssh/discourse_key azureuser@${{ steps.get_vm_info.outputs.vm_ip }} << 'EOF'
+              set -e
+              
+              # Backup current configuration
+              sudo cp $DISCOURSE_DIR/containers/app.yml $DISCOURSE_DIR/containers/app.yml.backup.$(date +%Y%m%d-%H%M%S) || true
+              
+              # Copy new configuration files
+              sudo cp /tmp/discourse-deploy/app.yml $DISCOURSE_DIR/containers/ || exit 1
+              sudo cp /tmp/discourse-deploy/*.sh $DISCOURSE_DIR/../ || exit 1
+              sudo chown -R $DISCOURSE_USER:$DISCOURSE_USER $DISCOURSE_DIR
+              sudo chmod +x $DISCOURSE_DIR/../*.sh
+              
+              # Reload Discourse configuration
+              cd $DISCOURSE_DIR
+              sudo -u $DISCOURSE_USER docker-compose exec discourse_app sv reload unicorn || exit 1
+              
+              echo "Configuration update completed"
+EOF
+            ;;
+            
+          "full-restart")
+            echo "Performing full restart..."
+            ssh -i ~/.ssh/discourse_key azureuser@${{ steps.get_vm_info.outputs.vm_ip }} << 'EOF'
+              set -e
+              
+              # Copy configuration files
+              sudo cp /tmp/discourse-deploy/app.yml $DISCOURSE_DIR/containers/ || exit 1
+              sudo cp /tmp/discourse-deploy/*.sh $DISCOURSE_DIR/../ || exit 1
+              sudo chown -R $DISCOURSE_USER:$DISCOURSE_USER $DISCOURSE_DIR
+              sudo chmod +x $DISCOURSE_DIR/../*.sh
+              
+              # Execute restart script
+              cd $DISCOURSE_DIR/..
+              sudo ./restart-discourse.sh restart || exit 1
+              
+              echo "Full restart completed"
+EOF
+            ;;
+            
+          "update-discourse")
+            echo "Updating Discourse to latest version..."
+            ssh -i ~/.ssh/discourse_key azureuser@${{ steps.get_vm_info.outputs.vm_ip }} << 'EOF'
+              set -e
+              
+              # Copy configuration files
+              sudo cp /tmp/discourse-deploy/app.yml $DISCOURSE_DIR/containers/ || exit 1
+              sudo cp /tmp/discourse-deploy/*.sh $DISCOURSE_DIR/../ || exit 1
+              sudo chown -R $DISCOURSE_USER:$DISCOURSE_USER $DISCOURSE_DIR
+              sudo chmod +x $DISCOURSE_DIR/../*.sh
+              
+              # Execute update
+              cd $DISCOURSE_DIR/..
+              sudo ./restart-discourse.sh update || exit 1
+              
+              echo "Discourse update completed"
+EOF
+            ;;
+            
+          "emergency-restart")
+            echo "Performing emergency restart..."
+            ssh -i ~/.ssh/discourse_key azureuser@${{ steps.get_vm_info.outputs.vm_ip }} << 'EOF'
+              set -e
+              
+              # Emergency restart without configuration changes
+              cd $DISCOURSE_DIR/..
+              sudo ./restart-discourse.sh restart || exit 1
+              
+              echo "Emergency restart completed"
+EOF
+            ;;
+        esac
+        
+        echo "status=success" >> $GITHUB_OUTPUT
+        echo "✅ Deployment completed successfully" >> $GITHUB_STEP_SUMMARY
+    
+    - name: Cleanup Temporary Files
+      if: always()
+      run: |
+        # Clean up temporary files on VM
+        ssh -i ~/.ssh/discourse_key azureuser@${{ steps.get_vm_info.outputs.vm_ip }} \
+          "sudo rm -rf /tmp/discourse-deploy" || true
+        
+        # Clean up local SSH key
+        rm -f ~/.ssh/discourse_key
+
+  # Health check and verification
+  health-check:
+    name: Health Check and Verification
+    runs-on: ubuntu-latest
+    needs: deploy-discourse
+    if: always() && needs.deploy-discourse.result == 'success'
+    
+    steps:
+    - name: Wait for Service Stabilization
+      run: |
+        echo "Waiting for Discourse to stabilize..."
+        sleep 60
+    
+    - name: Setup SSH for Health Checks
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.DISCOURSE_VM_SSH_KEY }}" > ~/.ssh/discourse_key
+        chmod 600 ~/.ssh/discourse_key
+        ssh-keyscan -H ${{ needs.deploy-discourse.outputs.vm_ip }} >> ~/.ssh/known_hosts
+    
+    - name: Verify Discourse Health
+      id: health_check
+      run: |
+        echo "## Health Check Results" >> $GITHUB_STEP_SUMMARY
+        
+        VM_IP="${{ needs.deploy-discourse.outputs.vm_ip }}"
+        HEALTH_PASSED=true
+        
+        # Test 1: Container Status
+        echo "### Container Status" >> $GITHUB_STEP_SUMMARY
+        if ssh -i ~/.ssh/discourse_key azureuser@$VM_IP \
+           "docker ps | grep discourse_app | grep -q Up"; then
+          echo "✅ Discourse container is running" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "❌ Discourse container is not running" >> $GITHUB_STEP_SUMMARY
+          HEALTH_PASSED=false
+        fi
+        
+        # Test 2: Health Endpoint
+        echo "### Health Endpoint" >> $GITHUB_STEP_SUMMARY
+        if ssh -i ~/.ssh/discourse_key azureuser@$VM_IP \
+           "curl -f http://localhost/srv/status >/dev/null 2>&1"; then
+          echo "✅ Health endpoint responding" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "❌ Health endpoint not responding" >> $GITHUB_STEP_SUMMARY
+          HEALTH_PASSED=false
+        fi
+        
+        # Test 3: External Accessibility
+        echo "### External Accessibility" >> $GITHUB_STEP_SUMMARY
+        if curl -f -s -o /dev/null --connect-timeout 30 https://forum.robbedbyapplecare.com/srv/status; then
+          echo "✅ Forum externally accessible" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "❌ Forum not externally accessible" >> $GITHUB_STEP_SUMMARY
+          HEALTH_PASSED=false
+        fi
+        
+        # Test 4: Database Connectivity
+        echo "### Database Connectivity" >> $GITHUB_STEP_SUMMARY
+        if ssh -i ~/.ssh/discourse_key azureuser@$VM_IP \
+           "docker exec discourse_app rails runner 'ActiveRecord::Base.connection.execute(\"SELECT 1\")' >/dev/null 2>&1"; then
+          echo "✅ Database connectivity OK" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "❌ Database connectivity failed" >> $GITHUB_STEP_SUMMARY
+          HEALTH_PASSED=false
+        fi
+        
+        # Test 5: Redis Connectivity
+        echo "### Redis Connectivity" >> $GITHUB_STEP_SUMMARY
+        if ssh -i ~/.ssh/discourse_key azureuser@$VM_IP \
+           "docker exec discourse_app redis-cli ping | grep -q PONG"; then
+          echo "✅ Redis connectivity OK" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "❌ Redis connectivity failed" >> $GITHUB_STEP_SUMMARY
+          HEALTH_PASSED=false
+        fi
+        
+        # Test 6: SSL Certificate
+        echo "### SSL Certificate" >> $GITHUB_STEP_SUMMARY
+        if echo | openssl s_client -servername forum.robbedbyapplecare.com \
+           -connect forum.robbedbyapplecare.com:443 2>/dev/null | \
+           openssl x509 -noout -dates >/dev/null 2>&1; then
+          echo "✅ SSL certificate valid" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "❌ SSL certificate issues" >> $GITHUB_STEP_SUMMARY
+          HEALTH_PASSED=false
+        fi
+        
+        # Test 7: Embedding Configuration
+        echo "### Embedding Configuration" >> $GITHUB_STEP_SUMMARY
+        if ssh -i ~/.ssh/discourse_key azureuser@$VM_IP \
+           "docker exec discourse_app rails runner 'puts SiteSetting.embed_whitelist' | grep -q robbedbyapplecare.com"; then
+          echo "✅ Embedding configuration OK" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "❌ Embedding configuration missing" >> $GITHUB_STEP_SUMMARY
+          HEALTH_PASSED=false
+        fi
+        
+        # Overall health status
+        if [ "$HEALTH_PASSED" = "true" ]; then
+          echo "health_status=healthy" >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "🎉 **All health checks passed!**" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "health_status=unhealthy" >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "⚠️ **Some health checks failed!**" >> $GITHUB_STEP_SUMMARY
+          exit 1
+        fi
+    
+    - name: Performance Test
+      run: |
+        echo "### Performance Test" >> $GITHUB_STEP_SUMMARY
+        
+        # Test response time
+        RESPONSE_TIME=$(curl -o /dev/null -s -w '%{time_total}' https://forum.robbedbyapplecare.com/ || echo "timeout")
+        
+        if [ "$RESPONSE_TIME" != "timeout" ]; then
+          echo "✅ Response time: ${RESPONSE_TIME}s" >> $GITHUB_STEP_SUMMARY
+          
+          # Check if response time is acceptable (< 5 seconds)
+          if (( $(echo "$RESPONSE_TIME < 5.0" | bc -l) )); then
+            echo "✅ Performance acceptable" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ Performance degraded (>5s)" >> $GITHUB_STEP_SUMMARY
+          fi
+        else
+          echo "❌ Performance test failed" >> $GITHUB_STEP_SUMMARY
+        fi
+    
+    - name: Collect Deployment Logs
+      if: always()
+      run: |
+        echo "Collecting deployment logs..."
+        
+        # Get recent Discourse logs
+        ssh -i ~/.ssh/discourse_key azureuser@${{ needs.deploy-discourse.outputs.vm_ip }} \
+          "docker logs discourse_app --tail 50" > discourse_logs.txt 2>&1 || true
+        
+        # Get system logs
+        ssh -i ~/.ssh/discourse_key azureuser@${{ needs.deploy-discourse.outputs.vm_ip }} \
+          "sudo journalctl -u discourse --no-pager --lines=20" > system_logs.txt 2>&1 || true
+        
+        echo "### Recent Logs" >> $GITHUB_STEP_SUMMARY
+        echo "<details><summary>Discourse Container Logs</summary>" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo '```' >> $GITHUB_STEP_SUMMARY
+        tail -20 discourse_logs.txt >> $GITHUB_STEP_SUMMARY 2>/dev/null || echo "No logs available" >> $GITHUB_STEP_SUMMARY
+        echo '```' >> $GITHUB_STEP_SUMMARY
+        echo "</details>" >> $GITHUB_STEP_SUMMARY
+    
+    - name: Cleanup SSH Key
+      if: always()
+      run: |
+        rm -f ~/.ssh/discourse_key
+
+  # Rollback on failure
+  rollback:
+    name: Rollback on Failure
+    runs-on: ubuntu-latest
+    needs: [deploy-discourse, health-check]
+    if: always() && (needs.deploy-discourse.result == 'failure' || needs.health-check.result == 'failure')
+    
+    steps:
+    - name: Setup SSH for Rollback
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.DISCOURSE_VM_SSH_KEY }}" > ~/.ssh/discourse_key
+        chmod 600 ~/.ssh/discourse_key
+        ssh-keyscan -H ${{ needs.deploy-discourse.outputs.vm_ip }} >> ~/.ssh/known_hosts
+    
+    - name: Perform Rollback
+      run: |
+        echo "## Rollback Procedure" >> $GITHUB_STEP_SUMMARY
+        echo "Deployment failed, attempting rollback..." >> $GITHUB_STEP_SUMMARY
+        
+        VM_IP="${{ needs.deploy-discourse.outputs.vm_ip }}"
+        
+        # Restore previous configuration if backup exists
+        ssh -i ~/.ssh/discourse_key azureuser@$VM_IP << 'EOF'
+          set -e
+          
+          # Find the most recent backup
+          BACKUP_FILE=$(ls -t $DISCOURSE_DIR/containers/app.yml.backup.* 2>/dev/null | head -1 || echo "")
+          
+          if [ -n "$BACKUP_FILE" ]; then
+            echo "Restoring configuration from: $BACKUP_FILE"
+            sudo cp "$BACKUP_FILE" $DISCOURSE_DIR/containers/app.yml
+            
+            # Restart Discourse with previous configuration
+            cd $DISCOURSE_DIR/..
+            sudo ./restart-discourse.sh restart
+            
+            echo "Rollback completed successfully"
+          else
+            echo "No backup found, performing emergency restart"
+            cd $DISCOURSE_DIR/..
+            sudo ./restart-discourse.sh restart
+          fi
+EOF
+        
+        echo "✅ Rollback completed" >> $GITHUB_STEP_SUMMARY
+    
+    - name: Cleanup SSH Key
+      if: always()
+      run: |
+        rm -f ~/.ssh/discourse_key
+
+  # Notification
+  notify:
+    name: Deployment Notification
+    runs-on: ubuntu-latest
+    needs: [deploy-discourse, health-check, rollback]
+    if: always()
+    
+    steps:
+    - name: Deployment Success Notification
+      if: needs.health-check.result == 'success'
+      run: |
+        echo "## 🚀 Discourse Deployment Successful" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Deployment Details:**" >> $GITHUB_STEP_SUMMARY
+        echo "- **Type:** ${{ github.event.inputs.deployment_type || 'config-update' }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Triggered by:** @${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Timestamp:** $(date -u)" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Services:**" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ Forum: https://forum.robbedbyapplecare.com" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ Health Check: https://forum.robbedbyapplecare.com/srv/status" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ Admin Panel: https://forum.robbedbyapplecare.com/admin" >> $GITHUB_STEP_SUMMARY
+    
+    - name: Deployment Failure Notification
+      if: needs.deploy-discourse.result == 'failure' || needs.health-check.result == 'failure'
+      run: |
+        echo "## ❌ Discourse Deployment Failed" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Failure Details:**" >> $GITHUB_STEP_SUMMARY
+        echo "- **Type:** ${{ github.event.inputs.deployment_type || 'config-update' }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Triggered by:** @${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Timestamp:** $(date -u)" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Status:**" >> $GITHUB_STEP_SUMMARY
+        echo "- Deployment: ${{ needs.deploy-discourse.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "- Health Check: ${{ needs.health-check.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "- Rollback: ${{ needs.rollback.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Next Steps:**" >> $GITHUB_STEP_SUMMARY
+        echo "1. Check the workflow logs for detailed error information" >> $GITHUB_STEP_SUMMARY
+        echo "2. Verify VM accessibility and SSH connectivity" >> $GITHUB_STEP_SUMMARY
+        echo "3. Check Discourse container status manually" >> $GITHUB_STEP_SUMMARY
+        echo "4. Consider manual intervention if rollback failed" >> $GITHUB_STEP_SUMMARY
+        
+        exit 1

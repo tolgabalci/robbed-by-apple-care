@@ -1,0 +1,36 @@
+<svg width="640" height="480" xmlns="http://www.w3.org/2000/svg">
+  <rect width="100%" height="100%" fill="#f8f9fa"/>
+  
+  <!-- Email header -->
+  <rect x="20" y="20" width="600" height="80" fill="#ffffff" stroke="#dee2e6" stroke-width="1"/>
+  <text x="40" y="40" font-family="Arial, sans-serif" font-size="12" fill="#495057" font-weight="bold">From: senior.advisor@apple.com</text>
+  <text x="40" y="55" font-family="Arial, sans-serif" font-size="12" fill="#495057">To: [REDACTED]@email.com</text>
+  <text x="40" y="70" font-family="Arial, sans-serif" font-size="12" fill="#495057" font-weight="bold">Subject: RE: Escalation Request - MacBook Pro Warranty Claim</text>
+  <text x="40" y="85" font-family="Arial, sans-serif" font-size="11" fill="#6c757d">Date: January 22, 2024 11:23 AM</text>
+  
+  <!-- Email body -->
+  <rect x="20" y="120" width="600" height="320" fill="#ffffff" stroke="#dee2e6" stroke-width="1"/>
+  <text x="40" y="145" font-family="Arial, sans-serif" font-size="12" fill="#212529">Hello,</text>
+  
+  <text x="40" y="175" font-family="Arial, sans-serif" font-size="12" fill="#212529">I understand your frustration regarding case #AC-2024-██████.</text>
+  <text x="40" y="190" font-family="Arial, sans-serif" font-size="12" fill="#212529">I have reviewed your previous interactions with our support team.</text>
+  
+  <text x="40" y="220" font-family="Arial, sans-serif" font-size="12" fill="#212529">Unfortunately, the diagnostic results indicate that your device's</text>
+  <text x="40" y="235" font-family="Arial, sans-serif" font-size="12" fill="#212529">behavior falls within acceptable operational parameters. The</text>
+  <text x="40" y="250" font-family="Arial, sans-serif" font-size="12" fill="#212529">intermittent shutdowns you described cannot be reproduced in</text>
+  <text x="40" y="265" font-family="Arial, sans-serif" font-size="12" fill="#212529">our testing environment.</text>
+  
+  <text x="40" y="295" font-family="Arial, sans-serif" font-size="12" fill="#212529">As this issue does not qualify for warranty coverage, I will be</text>
+  <text x="40" y="310" font-family="Arial, sans-serif" font-size="12" fill="#212529">closing this case. You may consider our paid diagnostic service</text>
+  <text x="40" y="325" font-family="Arial, sans-serif" font-size="12" fill="#212529">if you wish to pursue further investigation.</text>
+  
+  <text x="40" y="355" font-family="Arial, sans-serif" font-size="12" fill="#212529">Best regards,</text>
+  <text x="40" y="370" font-family="Arial, sans-serif" font-size="12" fill="#212529">Sarah M.</text>
+  <text x="40" y="385" font-family="Arial, sans-serif" font-size="12" fill="#212529">Senior AppleCare Advisor</text>
+  
+  <!-- Redaction bars -->
+  <rect x="350" y="182" width="80" height="12" fill="#000000"/>
+  <rect x="450" y="52" width="120" height="12" fill="#000000"/>
+  
+  <text x="320" y="460" font-family="Arial, sans-serif" font-size="10" fill="#adb5bd" text-anchor="middle">[EVIDENCE: Senior advisor dismissal of valid warranty claim]</text>
+</svg>

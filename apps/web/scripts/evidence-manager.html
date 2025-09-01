@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evidence Manager - RobbedByAppleCare</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f9fafb;
+            padding: 2rem;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .header p {
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 2rem;
+        }
+        
+        .drop-zone {
+            border: 2px dashed #d1d5db;
+            border-radius: 8px;
+            padding: 3rem 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin-bottom: 2rem;
+        }
+        
+        .drop-zone:hover,
+        .drop-zone.dragover {
+            border-color: #3b82f6;
+            background: #f0f9ff;
+        }
+        
+        .drop-zone.dragover {
+            transform: scale(1.02);
+        }
+        
+        .drop-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 1rem;
+            opacity: 0.5;
+        }
+        
+        .drop-text {
+            font-size: 1.125rem;
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
+        
+        .drop-subtext {
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .file-list {
+            margin-top: 2rem;
+        }
+        
+        .file-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            background: #f9fafb;
+        }
+        
+        .file-icon {
+            width: 40px;
+            height: 40px;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+        
+        .file-info {
+            flex: 1;
+        }
+        
+        .file-name {
+            font-weight: 500;
+            color: #374151;
+        }
+        
+        .file-size {
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+        
+        .file-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .status-ready {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .status-processing {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .status-complete {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .status-error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .process-btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 1rem;
+        }
+        
+        .process-btn:hover:not(:disabled) {
+            background: #2563eb;
+        }
+        
+        .process-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+        
+        .instructions {
+            background: #f0f9ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .instructions h3 {
+            color: #1e40af;
+            margin-bottom: 1rem;
+        }
+        
+        .instructions ol {
+            color: #374151;
+            padding-left: 1.5rem;
+        }
+        
+        .instructions li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .code {
+            background: #1f2937;
+            color: #f9fafb;
+            padding: 0.75rem;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.875rem;
+            margin: 0.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📸 Evidence Manager</h1>
+            <p>Upload and optimize evidence images for RobbedByAppleCare</p>
+        </div>
+        
+        <div class="content">
+            <div class="drop-zone" id="dropZone">
+                <svg class="drop-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                </svg>
+                <div class="drop-text">Drop evidence images here</div>
+                <div class="drop-subtext">or click to browse (JPG, PNG, TIFF, WebP)</div>
+            </div>
+            
+            <input type="file" id="fileInput" class="file-input" multiple accept="image/*">
+            
+            <div class="file-list" id="fileList" style="display: none;">
+                <h3>Selected Files</h3>
+                <div id="files"></div>
+                <button class="process-btn" id="processBtn" disabled>Process Images</button>
+            </div>
+            
+            <div class="instructions">
+                <h3>📋 Instructions</h3>
+                <ol>
+                    <li>Drop your evidence images into the area above or click to browse</li>
+                    <li>Supported formats: JPG, PNG, TIFF, WebP</li>
+                    <li>Images will be automatically optimized and EXIF data stripped</li>
+                    <li>Multiple sizes will be generated: 320px, 640px, 1280px, and full size</li>
+                    <li>After processing, copy the generated files to your evidence directory</li>
+                </ol>
+                
+                <h4 style="margin-top: 1.5rem; color: #1e40af;">Command Line Usage:</h4>
+                <div class="code">npm run process-evidence</div>
+                <p style="margin-top: 0.5rem; color: #6b7280; font-size: 0.875rem;">
+                    Place raw images in <code style="background: #e5e7eb; padding: 0.25rem; border-radius: 3px;">public/evidence/raw/</code> 
+                    and run the command to process them automatically.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const fileList = document.getElementById('fileList');
+        const filesContainer = document.getElementById('files');
+        const processBtn = document.getElementById('processBtn');
+        
+        let selectedFiles = [];
+        
+        // File size formatter
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
+        // Handle drag and drop
+        dropZone.addEventListener('click', () => fileInput.click());
+        
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+        
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+        
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            handleFiles(e.dataTransfer.files);
+        });
+        
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+        
+        function handleFiles(files) {
+            selectedFiles = Array.from(files).filter(file => file.type.startsWith('image/'));
+            displayFiles();
+        }
+        
+        function displayFiles() {
+            if (selectedFiles.length === 0) {
+                fileList.style.display = 'none';
+                return;
+            }
+            
+            fileList.style.display = 'block';
+            filesContainer.innerHTML = '';
+            
+            selectedFiles.forEach((file, index) => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                fileItem.innerHTML = `
+                    <svg class="file-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                    <div class="file-info">
+                        <div class="file-name">${file.name}</div>
+                        <div class="file-size">${formatFileSize(file.size)}</div>
+                    </div>
+                    <div class="file-status status-ready" id="status-${index}">Ready</div>
+                `;
+                filesContainer.appendChild(fileItem);
+            });
+            
+            processBtn.disabled = false;
+        }
+        
+        processBtn.addEventListener('click', processImages);
+        
+        async function processImages() {
+            processBtn.disabled = true;
+            processBtn.textContent = 'Processing...';
+            
+            for (let i = 0; i < selectedFiles.length; i++) {
+                const file = selectedFiles[i];
+                const statusEl = document.getElementById(`status-${i}`);
+                
+                try {
+                    statusEl.textContent = 'Processing';
+                    statusEl.className = 'file-status status-processing';
+                    
+                    // Simulate processing (in a real implementation, this would call the Node.js script)
+                    await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
+                    
+                    statusEl.textContent = 'Complete';
+                    statusEl.className = 'file-status status-complete';
+                } catch (error) {
+                    statusEl.textContent = 'Error';
+                    statusEl.className = 'file-status status-error';
+                }
+            }
+            
+            processBtn.textContent = 'Processing Complete!';
+            
+            // Show completion message
+            setTimeout(() => {
+                alert('🎉 Image processing complete!\n\nNote: This is a demo interface. In a real implementation, the processed images would be saved to your evidence directory.\n\nTo actually process images, use the command line:\nnpm run process-evidence');
+            }, 500);
+        }
+    </script>
+</body>
+</html>

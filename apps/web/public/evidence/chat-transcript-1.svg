@@ -1,0 +1,56 @@
+<svg width="640" height="600" xmlns="http://www.w3.org/2000/svg">
+  <rect width="100%" height="100%" fill="#f0f2f5"/>
+  
+  <!-- Chat window header -->
+  <rect x="20" y="20" width="600" height="50" fill="#1877f2" stroke="#1877f2"/>
+  <text x="40" y="40" font-family="Arial, sans-serif" font-size="14" fill="#ffffff" font-weight="bold">AppleCare Chat Support</text>
+  <text x="40" y="55" font-family="Arial, sans-serif" font-size="11" fill="#e4e6ea">Session ID: ████████ | January 15, 2024</text>
+  
+  <!-- Chat messages -->
+  <rect x="20" y="80" width="600" height="480" fill="#ffffff" stroke="#e4e6ea"/>
+  
+  <!-- Support message -->
+  <rect x="40" y="100" width="400" height="60" fill="#f0f2f5" rx="10"/>
+  <text x="50" y="115" font-family="Arial, sans-serif" font-size="11" fill="#65676b" font-weight="bold">AppleCare Support - 2:14 PM</text>
+  <text x="50" y="130" font-family="Arial, sans-serif" font-size="11" fill="#1c1e21">Hello! I'm here to help with your MacBook Pro issue.</text>
+  <text x="50" y="145" font-family="Arial, sans-serif" font-size="11" fill="#1c1e21">Can you provide your device serial number?</text>
+  
+  <!-- Customer message -->
+  <rect x="200" y="180" width="400" height="45" fill="#0084ff" rx="10"/>
+  <text x="210" y="195" font-family="Arial, sans-serif" font-size="11" fill="#ffffff" font-weight="bold">You - 2:15 PM</text>
+  <text x="210" y="210" font-family="Arial, sans-serif" font-size="11" fill="#ffffff">Serial: ██████████ - Random shutdowns started 3 days ago</text>
+  
+  <!-- Support message -->
+  <rect x="40" y="240" width="450" height="75" fill="#f0f2f5" rx="10"/>
+  <text x="50" y="255" font-family="Arial, sans-serif" font-size="11" fill="#65676b" font-weight="bold">AppleCare Support - 2:18 PM</text>
+  <text x="50" y="270" font-family="Arial, sans-serif" font-size="11" fill="#1c1e21">I see your device is under AppleCare+. Let me run some</text>
+  <text x="50" y="285" font-family="Arial, sans-serif" font-size="11" fill="#1c1e21">diagnostics. Please hold while I check your device remotely.</text>
+  <text x="50" y="300" font-family="Arial, sans-serif" font-size="11" fill="#1c1e21">This may take 5-10 minutes.</text>
+  
+  <!-- Long wait indicator -->
+  <rect x="40" y="330" width="300" height="30" fill="#fff3cd" stroke="#ffeaa7" rx="5"/>
+  <text x="50" y="350" font-family="Arial, sans-serif" font-size="11" fill="#856404">⏱️ Support agent typing... (25 minutes elapsed)</text>
+  
+  <!-- Support message -->
+  <rect x="40" y="380" width="480" height="90" fill="#f0f2f5" rx="10"/>
+  <text x="50" y="395" font-family="Arial, sans-serif" font-size="11" fill="#65676b" font-weight="bold">AppleCare Support - 2:47 PM</text>
+  <text x="50" y="410" font-family="Arial, sans-serif" font-size="11" fill="#1c1e21">I'm unable to reproduce the issue remotely. The diagnostics</text>
+  <text x="50" y="425" font-family="Arial, sans-serif" font-size="11" fill="#1c1e21">show all systems functioning normally. Have you tried</text>
+  <text x="50" y="440" font-family="Arial, sans-serif" font-size="11" fill="#1c1e21">restarting your device? I'll create a case for follow-up.</text>
+  <text x="50" y="455" font-family="Arial, sans-serif" font-size="11" fill="#1c1e21">Case #AC-2024-██████ - Someone will contact you soon.</text>
+  
+  <!-- Customer message -->
+  <rect x="150" y="490" width="450" height="45" fill="#0084ff" rx="10"/>
+  <text x="160" y="505" font-family="Arial, sans-serif" font-size="11" fill="#ffffff" font-weight="bold">You - 2:48 PM</text>
+  <text x="160" y="520" font-family="Arial, sans-serif" font-size="11" fill="#ffffff">Yes, I've restarted multiple times. When will someone call?</text>
+  
+  <!-- Disconnection notice -->
+  <rect x="200" y="550" width="240" height="25" fill="#ffebee" stroke="#f8bbd9" rx="5"/>
+  <text x="210" y="567" font-family="Arial, sans-serif" font-size="10" fill="#c62828">⚠️ Support agent has left the chat</text>
+  
+  <!-- Redaction bars -->
+  <rect x="280" y="202" width="80" height="12" fill="#000000"/>
+  <rect x="350" y="447" width="80" height="12" fill="#000000"/>
+  
+  <text x="320" y="590" font-family="Arial, sans-serif" font-size="10" fill="#adb5bd" text-anchor="middle">[EVIDENCE: Chat support session - agent disconnect after creating case]</text>
+</svg>

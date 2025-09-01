@@ -1,0 +1,161 @@
+name: Infrastructure Security Scanning
+
+on:
+  push:
+    paths: [ 'infra/**' ]
+  pull_request:
+    paths: [ 'infra/**' ]
+  schedule:
+    # Run security scans daily at 2 AM UTC
+    - cron: '0 2 * * *'
+
+jobs:
+  terraform-security:
+    name: Terraform Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Run Checkov
+      uses: bridgecrewio/checkov-action@master
+      with:
+        directory: ./infra/terraform
+        framework: terraform
+        output_format: cli,sarif
+        output_file_path: reports/checkov-results.sarif
+        soft_fail: false
+        download_external_modules: true
+    
+    - name: Upload Checkov results to GitHub Security tab
+      uses: github/codeql-action/upload-sarif@v2
+      if: always()
+      with:
+        sarif_file: reports/checkov-results.sarif
+    
+    - name: Run TFSec
+      uses: aquasecurity/tfsec-action@v1.0.3
+      with:
+        working_directory: ./infra/terraform
+        format: sarif
+        sarif_file: reports/tfsec-results.sarif
+        soft_fail: false
+    
+    - name: Upload TFSec results
+      uses: github/codeql-action/upload-sarif@v2
+      if: always()
+      with:
+        sarif_file: reports/tfsec-results.sarif
+    
+    - name: Run Trivy IaC scan
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'config'
+        scan-ref: './infra/terraform'
+        format: 'sarif'
+        output: 'reports/trivy-iac-results.sarif'
+    
+    - name: Upload Trivy IaC results
+      uses: github/codeql-action/upload-sarif@v2
+      if: always()
+      with:
+        sarif_file: reports/trivy-iac-results.sarif
+
+  docker-security:
+    name: Docker Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Run Trivy Docker scan
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: './apps/forum-provisioning'
+        format: 'sarif'
+        output: 'reports/trivy-docker-results.sarif'
+    
+    - name: Upload Trivy Docker results
+      uses: github/codeql-action/upload-sarif@v2
+      if: always()
+      with:
+        sarif_file: reports/trivy-docker-results.sarif
+    
+    - name: Scan Discourse Docker configuration
+      run: |
+        echo "## Docker Security Scan Results" >> $GITHUB_STEP_SUMMARY
+        
+        # Check for hardcoded secrets in app.yml
+        if grep -r "password\|secret\|key" apps/forum-provisioning/app.yml | grep -v "ENV\|DISCOURSE"; then
+          echo "⚠️ Potential hardcoded secrets found in app.yml" >> $GITHUB_STEP_SUMMARY
+          exit 1
+        else
+          echo "✅ No hardcoded secrets detected in Docker configuration" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        # Check for proper secret management
+        if grep -q "DISCOURSE_.*=" apps/forum-provisioning/app.yml; then
+          echo "✅ Environment variables properly configured" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "⚠️ Environment variables may not be properly configured" >> $GITHUB_STEP_SUMMARY
+        fi
+
+  compliance-check:
+    name: Compliance and Best Practices
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Check Azure Security Baseline
+      run: |
+        echo "## Azure Security Baseline Compliance" >> $GITHUB_STEP_SUMMARY
+        
+        # Check for required security configurations
+        ISSUES=0
+        
+        # Check for NSG rules
+        if grep -r "azurerm_network_security_group" infra/terraform/; then
+          echo "✅ Network Security Groups configured" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "⚠️ Network Security Groups not found" >> $GITHUB_STEP_SUMMARY
+          ISSUES=$((ISSUES + 1))
+        fi
+        
+        # Check for Key Vault
+        if grep -r "azurerm_key_vault" infra/terraform/; then
+          echo "✅ Key Vault configured for secret management" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "⚠️ Key Vault not configured" >> $GITHUB_STEP_SUMMARY
+          ISSUES=$((ISSUES + 1))
+        fi
+        
+        # Check for managed identity
+        if grep -r "azurerm_user_assigned_identity\|identity.*SystemAssigned" infra/terraform/; then
+          echo "✅ Managed Identity configured" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "⚠️ Managed Identity not found" >> $GITHUB_STEP_SUMMARY
+          ISSUES=$((ISSUES + 1))
+        fi
+        
+        # Check for encryption at rest
+        if grep -r "encryption\|storage_encrypted" infra/terraform/; then
+          echo "✅ Encryption configurations found" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "⚠️ Encryption at rest may not be configured" >> $GITHUB_STEP_SUMMARY
+          ISSUES=$((ISSUES + 1))
+        fi
+        
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Total Issues Found:** $ISSUES" >> $GITHUB_STEP_SUMMARY
+        
+        if [ $ISSUES -gt 2 ]; then
+          echo "❌ Too many compliance issues found" >> $GITHUB_STEP_SUMMARY
+          exit 1
+        else
+          echo "✅ Compliance check passed" >> $GITHUB_STEP_SUMMARY
+        fi

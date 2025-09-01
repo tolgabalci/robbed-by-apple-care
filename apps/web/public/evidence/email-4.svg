@@ -1,0 +1,38 @@
+<svg width="640" height="520" xmlns="http://www.w3.org/2000/svg">
+  <rect width="100%" height="100%" fill="#f8f9fa"/>
+  
+  <!-- Email header -->
+  <rect x="20" y="20" width="600" height="80" fill="#ffffff" stroke="#dee2e6" stroke-width="1"/>
+  <text x="40" y="40" font-family="Arial, sans-serif" font-size="12" fill="#495057" font-weight="bold">From: noreply@apple.com</text>
+  <text x="40" y="55" font-family="Arial, sans-serif" font-size="12" fill="#495057">To: [REDACTED]@email.com</text>
+  <text x="40" y="70" font-family="Arial, sans-serif" font-size="12" fill="#495057" font-weight="bold">Subject: AppleCare Case Update - No Further Action Required</text>
+  <text x="40" y="85" font-family="Arial, sans-serif" font-size="11" fill="#6c757d">Date: January 28, 2024 3:47 PM</text>
+  
+  <!-- Email body -->
+  <rect x="20" y="120" width="600" height="350" fill="#ffffff" stroke="#dee2e6" stroke-width="1"/>
+  <text x="40" y="145" font-family="Arial, sans-serif" font-size="12" fill="#212529">Dear Valued Customer,</text>
+  
+  <text x="40" y="175" font-family="Arial, sans-serif" font-size="12" fill="#212529">This is an automated notification regarding your recent AppleCare</text>
+  <text x="40" y="190" font-family="Arial, sans-serif" font-size="12" fill="#212529">support case #AC-2024-██████.</text>
+  
+  <text x="40" y="220" font-family="Arial, sans-serif" font-size="12" fill="#212529">After thorough review, our technical team has determined that</text>
+  <text x="40" y="235" font-family="Arial, sans-serif" font-size="12" fill="#212529">your device is functioning within normal parameters. No further</text>
+  <text x="40" y="250" font-family="Arial, sans-serif" font-size="12" fill="#212529">action is required at this time.</text>
+  
+  <text x="40" y="280" font-family="Arial, sans-serif" font-size="12" fill="#212529" font-weight="bold">Case Status: CLOSED</text>
+  <text x="40" y="295" font-family="Arial, sans-serif" font-size="12" fill="#212529">Resolution: No defect found</text>
+  
+  <text x="40" y="325" font-family="Arial, sans-serif" font-size="12" fill="#212529">If you continue to experience issues, please create a new</text>
+  <text x="40" y="340" font-family="Arial, sans-serif" font-size="12" fill="#212529">support case through our online portal.</text>
+  
+  <text x="40" y="370" font-family="Arial, sans-serif" font-size="12" fill="#212529">Thank you for choosing Apple.</text>
+  
+  <text x="40" y="400" font-family="Arial, sans-serif" font-size="12" fill="#212529">AppleCare Support</text>
+  <text x="40" y="415" font-family="Arial, sans-serif" font-size="11" fill="#6c757d">This is an automated message. Please do not reply.</text>
+  
+  <!-- Redaction bars -->
+  <rect x="280" y="182" width="80" height="12" fill="#000000"/>
+  <rect x="450" y="52" width="120" height="12" fill="#000000"/>
+  
+  <text x="320" y="500" font-family="Arial, sans-serif" font-size="10" fill="#adb5bd" text-anchor="middle">[EVIDENCE: Automated case closure without resolution]</text>
+</svg>

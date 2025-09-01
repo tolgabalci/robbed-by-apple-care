@@ -1,0 +1,164 @@
+## This is the Discourse Docker configuration file for RobbedByAppleCare
+## Documentation: https://github.com/discourse/discourse_docker
+
+templates:
+  - "templates/postgres.template.yml"
+  - "templates/redis.template.yml"
+  - "templates/web.template.yml"
+  - "templates/web.ratelimited.template.yml"
+  - "templates/web.ssl.template.yml"
+  - "templates/web.letsencrypt.ssl.template.yml"
+
+expose:
+  - "80:80"   # http
+  - "443:443" # https
+
+params:
+  db_default_text_search_config: "pg_catalog.english"
+  db_shared_buffers: "256MB"
+  db_work_mem: "40MB"
+
+env:
+  # Basic Discourse Configuration
+  LANG: en_US.UTF-8
+  DISCOURSE_DEFAULT_LOCALE: en
+  DISCOURSE_HOSTNAME: forum.robbedbyapplecare.com
+  DISCOURSE_DEVELOPER_EMAILS: admin@robbedbyapplecare.com
+  
+  # PostgreSQL Configuration (Azure Database for PostgreSQL Flexible Server)
+  DISCOURSE_DB_HOST: ${POSTGRES_HOST}
+  DISCOURSE_DB_PORT: 5432
+  DISCOURSE_DB_NAME: discourse_production
+  DISCOURSE_DB_USERNAME: discourse_user
+  DISCOURSE_DB_PASSWORD: ${POSTGRES_PASSWORD}
+  DISCOURSE_DB_POOL: 25
+  
+  # Redis Configuration (using local container)
+  DISCOURSE_REDIS_HOST: redis
+  DISCOURSE_REDIS_PORT: 6379
+  
+  # Azure Blob Storage Configuration (S3-compatible)
+  DISCOURSE_USE_S3: true
+  DISCOURSE_S3_REGION: us-east-1  # Required but not used for Azure
+  DISCOURSE_S3_ACCESS_KEY_ID: ${BLOB_ACCESS_KEY}
+  DISCOURSE_S3_SECRET_ACCESS_KEY: ${BLOB_SECRET_KEY}
+  DISCOURSE_S3_BUCKET: discourse-uploads
+  DISCOURSE_S3_ENDPOINT: https://${STORAGE_ACCOUNT}.blob.core.windows.net
+  DISCOURSE_S3_CDN_URL: https://${STORAGE_ACCOUNT}.blob.core.windows.net/discourse-uploads
+  DISCOURSE_S3_FORCE_PATH_STYLE: true
+  
+  # SMTP Configuration for email notifications
+  DISCOURSE_SMTP_ADDRESS: ${SMTP_HOST}
+  DISCOURSE_SMTP_PORT: 587
+  DISCOURSE_SMTP_USER_NAME: ${SMTP_USERNAME}
+  DISCOURSE_SMTP_PASSWORD: ${SMTP_PASSWORD}
+  DISCOURSE_SMTP_ENABLE_START_TLS: true
+  DISCOURSE_SMTP_AUTHENTICATION: login
+  DISCOURSE_SMTP_OPENSSL_VERIFY_MODE: peer
+  
+  # Google OAuth Configuration
+  DISCOURSE_GOOGLE_OAUTH2_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+  DISCOURSE_GOOGLE_OAUTH2_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+  
+  # Facebook OAuth Configuration
+  DISCOURSE_FACEBOOK_APP_ID: ${FACEBOOK_APP_ID}
+  DISCOURSE_FACEBOOK_APP_SECRET: ${FACEBOOK_APP_SECRET}
+  
+  # Security and Performance Settings
+  DISCOURSE_FORCE_HTTPS: true
+  DISCOURSE_CDN_URL: https://${CDN_HOSTNAME}
+  DISCOURSE_CORS_ORIGIN: https://www.robbedbyapplecare.com
+  
+  # Embedding Configuration
+  DISCOURSE_EMBED_WHITELIST_SELECTOR: "article"
+  DISCOURSE_EMBED_CLASSNAME_WHITELIST: "discourse-embed-frame"
+  
+  # Memory and Performance
+  UNICORN_WORKERS: 2
+  UNICORN_SIDEKIQS: 1
+
+volumes:
+  - volume:
+      host: /var/discourse/shared/standalone
+      guest: /shared
+  - volume:
+      host: /var/discourse/shared/standalone/log/var-log
+      guest: /var/log
+
+hooks:
+  after_code:
+    - exec:
+        cd: $home/plugins
+        cmd:
+          - git clone https://github.com/discourse/discourse-oauth2-basic.git
+          - git clone https://github.com/discourse/discourse-solved.git
+          - git clone https://github.com/discourse/discourse-voting.git
+
+  before_bundle_exec:
+    - file:
+        path: $home/config/discourse.conf
+        contents: |
+          # Additional Discourse configuration
+          enable_cors = true
+          cors_origin = 'https://www.robbedbyapplecare.com'
+          embed_any_origin = false
+          embed_whitelist_selector = 'article'
+          
+          # Rate limiting
+          max_reqs_per_ip_per_minute = 200
+          max_reqs_per_ip_per_10_seconds = 50
+          
+          # Security headers
+          force_https = true
+          secure_media = true
+          
+          # Performance
+          enable_performance_bar_for_staff = true
+
+  after_bundle_exec:
+    - exec:
+        cd: $home
+        cmd:
+          - echo "Configuring Discourse for RobbedByAppleCare..."
+          
+  after_migrate:
+    - exec:
+        cd: $home
+        cmd:
+          - echo "Running post-migration configuration..."
+          - rails runner "
+            # Enable embedding
+            SiteSetting.embed_any_origin = false
+            SiteSetting.embed_whitelist_selector = 'article'
+            SiteSetting.embed_post_limit = 100
+            SiteSetting.embed_truncate = true
+            SiteSetting.embed_whitelist = 'www.robbedbyapplecare.com'
+            
+            # Configure OAuth providers
+            SiteSetting.enable_google_oauth2_logins = true
+            SiteSetting.enable_facebook_logins = true
+            
+            # Security settings
+            SiteSetting.force_https = true
+            SiteSetting.secure_media = true
+            SiteSetting.login_required = false
+            SiteSetting.must_approve_users = false
+            
+            # Email settings
+            SiteSetting.notification_email = 'noreply@robbedbyapplecare.com'
+            SiteSetting.contact_email = 'admin@robbedbyapplecare.com'
+            
+            # Forum settings
+            SiteSetting.title = 'RobbedByAppleCare Community'
+            SiteSetting.site_description = 'Community discussion about AppleCare experiences'
+            SiteSetting.allow_uncategorized_topics = true
+            
+            # Performance settings
+            SiteSetting.max_image_size_kb = 10240
+            SiteSetting.max_attachment_size_kb = 10240
+            
+            puts 'Discourse configuration completed!'
+            "
+
+run:
+  - exec: echo "Discourse container for RobbedByAppleCare is ready"

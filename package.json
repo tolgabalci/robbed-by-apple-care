@@ -1,0 +1,33 @@
+{
+  "name": "robbed-by-apple-care",
+  "version": "1.0.0",
+  "description": "Single-page article site with embedded Discourse comments",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "infra/*"
+  ],
+  "packageManager": "pnpm@8.15.0",
+  "scripts": {
+    "dev": "pnpm --filter apps/web dev",
+    "build": "pnpm --filter apps/web build",
+    "start": "pnpm --filter apps/web start",
+    "lint": "pnpm --filter apps/web lint",
+    "test": "pnpm --filter apps/web test",
+    "type-check": "pnpm --filter apps/web type-check",
+    "clean": "pnpm -r clean",
+    "terraform:init": "cd infra/terraform && terraform init",
+    "terraform:plan": "cd infra/terraform && terraform plan",
+    "terraform:apply": "cd infra/terraform && terraform apply",
+    "discourse:up": "cd apps/forum-provisioning && docker-compose up -d",
+    "discourse:down": "cd apps/forum-provisioning && docker-compose down"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "typescript": "^5.3.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  }
+}

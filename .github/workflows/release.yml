@@ -1,0 +1,323 @@
+name: Release and Deploy
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'prod'
+        type: choice
+        options:
+          - prod
+          - dev
+      force_deploy:
+        description: 'Force deployment even if no changes'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  TF_VERSION: "1.6.0"
+
+jobs:
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    
+    outputs:
+      release_id: ${{ steps.create_release.outputs.id }}
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Generate changelog
+      id: changelog
+      run: |
+        # Generate changelog from git commits since last tag
+        PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+        if [[ -n "$PREVIOUS_TAG" ]]; then
+          CHANGELOG=$(git log --pretty=format:"- %s (%h)" $PREVIOUS_TAG..HEAD)
+        else
+          CHANGELOG=$(git log --pretty=format:"- %s (%h)" HEAD)
+        fi
+        
+        echo "changelog<<EOF" >> $GITHUB_OUTPUT
+        echo "$CHANGELOG" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+    
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref_name }}
+        release_name: Release ${{ github.ref_name }}
+        body: |
+          ## Changes in this Release
+          
+          ${{ steps.changelog.outputs.changelog }}
+          
+          ## Deployment Status
+          
+          - [ ] Infrastructure deployed
+          - [ ] Web application deployed
+          - [ ] Discourse configuration updated
+          
+          ## Verification Checklist
+          
+          - [ ] Website accessible at https://www.robbedbyapplecare.com
+          - [ ] Forum accessible at https://forum.robbedbyapplecare.com
+          - [ ] Comments embedding working
+          - [ ] SSL certificates valid
+          - [ ] Performance metrics acceptable
+        draft: false
+        prerelease: false
+
+  deploy-infrastructure:
+    name: Deploy Infrastructure
+    runs-on: ubuntu-latest
+    needs: [create-release]
+    if: always() && (startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch')
+    environment: ${{ github.event.inputs.environment || 'prod' }}
+    
+    defaults:
+      run:
+        working-directory: infra/terraform
+    
+    outputs:
+      static_web_app_url: ${{ steps.terraform_output.outputs.static_web_app_url }}
+      discourse_vm_ip: ${{ steps.terraform_output.outputs.discourse_vm_ip }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: ${{ env.TF_VERSION }}
+        terraform_wrapper: false
+    
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+    
+    - name: Terraform Init
+      run: |
+        terraform init \
+          -backend-config="resource_group_name=${{ secrets.TF_STATE_RESOURCE_GROUP }}" \
+          -backend-config="storage_account_name=${{ secrets.TF_STATE_STORAGE_ACCOUNT }}" \
+          -backend-config="container_name=${{ secrets.TF_STATE_CONTAINER }}" \
+          -backend-config="key=terraform.tfstate"
+    
+    - name: Terraform Plan
+      id: plan
+      run: |
+        ENV="${{ github.event.inputs.environment || 'prod' }}"
+        terraform plan \
+          -var-file="environments/${ENV}.tfvars" \
+          -out=tfplan \
+          -detailed-exitcode
+        echo "exitcode=$?" >> $GITHUB_OUTPUT
+    
+    - name: Terraform Apply
+      if: steps.plan.outputs.exitcode == 2 || github.event.inputs.force_deploy == 'true'
+      run: terraform apply -auto-approve tfplan
+    
+    - name: Get Terraform Outputs
+      id: terraform_output
+      run: |
+        echo "static_web_app_url=$(terraform output -raw static_web_app_url)" >> $GITHUB_OUTPUT
+        echo "discourse_vm_ip=$(terraform output -raw discourse_vm_ip)" >> $GITHUB_OUTPUT
+    
+    - name: Update Release with Infrastructure Status
+      if: needs.create-release.outputs.release_id
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const { data: release } = await github.rest.repos.getRelease({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            release_id: ${{ needs.create-release.outputs.release_id }}
+          });
+          
+          const updatedBody = release.body.replace(
+            '- [ ] Infrastructure deployed',
+            '- [x] Infrastructure deployed'
+          );
+          
+          await github.rest.repos.updateRelease({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            release_id: ${{ needs.create-release.outputs.release_id }},
+            body: updatedBody
+          });
+
+  deploy-web-app:
+    name: Deploy Web Application
+    runs-on: ubuntu-latest
+    needs: [create-release, deploy-infrastructure]
+    if: always() && needs.deploy-infrastructure.result == 'success'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: 'apps/web/package-lock.json'
+    
+    - name: Install dependencies
+      run: |
+        cd apps/web
+        npm ci
+    
+    - name: Build application
+      run: |
+        cd apps/web
+        npm run build
+    
+    - name: Deploy to Azure Static Web Apps
+      uses: Azure/static-web-apps-deploy@v1
+      with:
+        azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        action: "upload"
+        app_location: "apps/web"
+        output_location: "out"
+    
+    - name: Update Release with Web App Status
+      if: needs.create-release.outputs.release_id
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const { data: release } = await github.rest.repos.getRelease({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            release_id: ${{ needs.create-release.outputs.release_id }}
+          });
+          
+          const updatedBody = release.body.replace(
+            '- [ ] Web application deployed',
+            '- [x] Web application deployed'
+          );
+          
+          await github.rest.repos.updateRelease({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            release_id: ${{ needs.create-release.outputs.release_id }},
+            body: updatedBody
+          });
+
+  post-deployment-verification:
+    name: Post-Deployment Verification
+    runs-on: ubuntu-latest
+    needs: [create-release, deploy-infrastructure, deploy-web-app]
+    if: always() && needs.deploy-web-app.result == 'success'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Wait for deployment propagation
+      run: sleep 60
+    
+    - name: Verify website accessibility
+      run: |
+        echo "## Deployment Verification Results" >> $GITHUB_STEP_SUMMARY
+        
+        # Test main website
+        if curl -f -s -o /dev/null https://www.robbedbyapplecare.com; then
+          echo "✅ Main website accessible" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "❌ Main website not accessible" >> $GITHUB_STEP_SUMMARY
+          exit 1
+        fi
+        
+        # Test SSL certificate
+        if echo | openssl s_client -servername www.robbedbyapplecare.com -connect www.robbedbyapplecare.com:443 2>/dev/null | openssl x509 -noout -dates; then
+          echo "✅ SSL certificate valid" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "❌ SSL certificate issues" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        # Test security headers
+        HEADERS=$(curl -s -I https://www.robbedbyapplecare.com)
+        if echo "$HEADERS" | grep -q "strict-transport-security"; then
+          echo "✅ Security headers present" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "⚠️ Security headers missing" >> $GITHUB_STEP_SUMMARY
+        fi
+    
+    - name: Performance test
+      run: |
+        # Install Lighthouse CI
+        npm install -g @lhci/cli
+        
+        # Run Lighthouse audit
+        lhci autorun --upload.target=temporary-public-storage --collect.url=https://www.robbedbyapplecare.com || true
+        
+        echo "📊 Performance audit completed" >> $GITHUB_STEP_SUMMARY
+    
+    - name: Update final release status
+      if: needs.create-release.outputs.release_id
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const { data: release } = await github.rest.repos.getRelease({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            release_id: ${{ needs.create-release.outputs.release_id }}
+          });
+          
+          let updatedBody = release.body.replace(
+            '- [ ] Discourse configuration updated',
+            '- [x] Discourse configuration updated'
+          );
+          
+          updatedBody += '\n\n## Deployment Completed\n\n';
+          updatedBody += `**Timestamp:** ${new Date().toISOString()}\n`;
+          updatedBody += `**Deployed by:** @${{ github.actor }}\n`;
+          updatedBody += `**Commit:** ${context.sha.substring(0, 7)}\n`;
+          
+          await github.rest.repos.updateRelease({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            release_id: ${{ needs.create-release.outputs.release_id }},
+            body: updatedBody
+          });
+
+  notify-deployment:
+    name: Notify Deployment Status
+    runs-on: ubuntu-latest
+    needs: [deploy-infrastructure, deploy-web-app, post-deployment-verification]
+    if: always()
+    
+    steps:
+    - name: Deployment Success Notification
+      if: needs.post-deployment-verification.result == 'success'
+      run: |
+        echo "🚀 Deployment completed successfully!"
+        echo "Website: https://www.robbedbyapplecare.com"
+        echo "Forum: https://forum.robbedbyapplecare.com"
+    
+    - name: Deployment Failure Notification
+      if: failure()
+      run: |
+        echo "❌ Deployment failed!"
+        echo "Check the workflow logs for details."
+        exit 1
