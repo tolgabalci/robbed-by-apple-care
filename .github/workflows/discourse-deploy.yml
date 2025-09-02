@@ -1,12 +1,13 @@
 name: Deploy Discourse Configuration
 
 on:
-  push:
-    branches: [ main ]
-    paths: [ 'apps/forum-provisioning/**' ]
-  pull_request:
-    branches: [ main ]
-    paths: [ 'apps/forum-provisioning/**' ]
+  # Temporarily disabled - infrastructure deployment handles Discourse setup
+  # push:
+  #   branches: [ main ]
+  #   paths: [ 'apps/forum-provisioning/**' ]
+  # pull_request:
+  #   branches: [ main ]
+  #   paths: [ 'apps/forum-provisioning/**' ]
   workflow_dispatch:
     inputs:
       deployment_type:
