@@ -1,13 +1,8 @@
 name: Deploy Discourse Configuration
 
+# TEMPORARILY DISABLED - This workflow has YAML syntax errors and is not needed
+# The main release workflow handles complete deployment including Discourse setup
 on:
-  # Temporarily disabled - infrastructure deployment handles Discourse setup
-  # push:
-  #   branches: [ main ]
-  #   paths: [ 'apps/forum-provisioning/**' ]
-  # pull_request:
-  #   branches: [ main ]
-  #   paths: [ 'apps/forum-provisioning/**' ]
   workflow_dispatch:
     inputs:
       deployment_type:

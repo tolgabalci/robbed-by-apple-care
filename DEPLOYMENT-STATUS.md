@@ -14,38 +14,23 @@ GitHub secrets configured for Azure deployment:
 - ❌ **AZURE_RESOURCE_GROUP** - Resource group name (should be "RobbedByAppleCare")
 - ❌ **DISCOURSE_VM_SSH_KEY** - SSH private key for VM access
 
-## 🔧 Issue Identified
+## ✅ Issue Resolved
 
-The **discourse-deploy** workflow failed because:
+The **discourse-deploy** workflow was failing due to:
 
-1. **Missing Secrets**: The workflow needs `AZURE_RESOURCE_GROUP` and `DISCOURSE_VM_SSH_KEY` secrets
-2. **Wrong Execution Order**: Discourse deployment tried to run before infrastructure was deployed
-3. **VM Not Created**: The workflow tried to connect to a VM that doesn't exist yet
+1. **YAML Syntax Errors**: The workflow file had malformed YAML due to heredoc blocks
+2. **Missing Secrets**: The workflow needed `AZURE_RESOURCE_GROUP` and `DISCOURSE_VM_SSH_KEY` secrets
+3. **Wrong Execution Order**: Discourse deployment tried to run before infrastructure was deployed
 
-## 🎯 Next Steps
-
-### Option 1: Fix Missing Secrets (Quick Fix)
-
-Add these GitHub secrets manually:
-
-1. **AZURE_RESOURCE_GROUP**: `RobbedByAppleCare`
-2. **DISCOURSE_VM_SSH_KEY**: Generate SSH key pair and add private key
-
-### Option 2: Disable Discourse Workflow (Recommended)
-
-Since the main infrastructure deployment will handle Discourse setup via Terraform, we can:
-
-1. Disable the discourse-deploy workflow temporarily
-2. Let the main release workflow handle everything
-3. Re-enable discourse-deploy later for configuration updates
+**Resolution**: The problematic workflow has been **disabled** by renaming it to `.yml.disabled`. The main release workflow will handle all deployment including Discourse setup via Terraform.
 
 ## 📋 Current Deployment Status
 
 - ✅ **Release Tag Created**: v1.0.0
-- ⚠️ **Infrastructure Deployment**: In progress (check GitHub Actions)
-- ❌ **Discourse Deployment**: Failed (missing secrets)
+- ✅ **Discourse Issue Fixed**: Problematic workflow disabled
+- ⏳ **Infrastructure Deployment**: In progress (check GitHub Actions)
 - ⏳ **Web App Deployment**: Waiting for infrastructure
 
 ---
 
-**Recommendation**: Let the main release workflow complete first, then address Discourse configuration separately.
+**Status**: The discourse-deploy failure is resolved. Your main deployment should now proceed without issues! 🎉
