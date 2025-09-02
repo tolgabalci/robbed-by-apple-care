@@ -1,0 +1,468 @@
+# Page snapshot
+
+```yaml
+- main [ref=e3]:
+  - generic [ref=e4]:
+    - navigation [ref=e5]:
+      - generic [ref=e7]:
+        - generic [ref=e8]: "Robbed by AppleCare: A Customer Service Nightmare"
+        - button "Switch to dark mode" [ref=e10] [cursor=pointer]:
+          - img [ref=e11] [cursor=pointer]
+    - article [ref=e13]:
+      - generic [ref=e14]:
+        - 'heading "Robbed by AppleCare: A Customer Service Nightmare" [level=1] [ref=e15]'
+        - paragraph [ref=e16]: How Apple's premium support service failed me when I needed it most - despite valid warranty coverage and clear hardware defects
+        - generic [ref=e17]:
+          - generic [ref=e18]: By Anonymous Customer
+          - time [ref=e19]: February 4, 2024
+          - generic [ref=e20]: 8 min read
+          - generic [ref=e21]: 1,470 words
+        - generic [ref=e22]:
+          - generic [ref=e23]: AppleCare
+          - generic [ref=e24]: Apple
+          - generic [ref=e25]: Customer Service
+          - generic [ref=e26]: Warranty
+          - generic [ref=e27]: Support
+          - generic [ref=e28]: MacBook Pro
+          - generic [ref=e29]: Hardware Defect
+        - 'img "Robbed by AppleCare: A Customer Service Nightmare" [ref=e31]'
+      - generic [ref=e33]:
+        - heading "TL;DR" [level=2] [ref=e34]:
+          - link "TL;DR" [ref=e35] [cursor=pointer]:
+            - /url: "#tldr"
+        - paragraph [ref=e36]: My 8-month-old MacBook Pro developed critical hardware issues covered under AppleCare+. Despite paying for premium support, Apple dismissed valid diagnostic warnings, ignored warranty coverage, and closed my case without resolution after weeks of runaround.
+      - generic [ref=e38]:
+        - heading "When Premium Support Becomes Premium Frustration" [level=2] [ref=e39]:
+          - link "When Premium Support Becomes Premium Frustration" [ref=e40] [cursor=pointer]:
+            - /url: "#when-premium-support-becomes-premium-frustration"
+        - paragraph [ref=e41]: "It started innocently enough. My MacBook Pro 14-inch (2023), barely 8 months old and protected by AppleCare+, began experiencing random shutdowns during normal use. As someone who paid extra for Apple's premium support service, I expected the process to be straightforward: report the issue, get it diagnosed, and receive a repair or replacement."
+        - paragraph [ref=e42]: What followed was a masterclass in corporate gaslighting, bureaucratic incompetence, and customer service failure that would make Kafka proud.
+        - 'heading "The Hardware Issue: Real and Documented" [level=2] [ref=e43]':
+          - 'link "The Hardware Issue: Real and Documented" [ref=e44] [cursor=pointer]':
+            - /url: "#the-hardware-issue-real-and-documented"
+        - paragraph [ref=e45]: "Before diving into the support nightmare, let's establish the facts. My MacBook Pro was experiencing:"
+        - list [ref=e46]:
+          - listitem [ref=e47]:
+            - strong [ref=e48]: Random shutdowns
+            - text: during normal operation (not under heavy load)
+          - listitem [ref=e49]:
+            - strong [ref=e50]: Power fluctuations
+            - text: that caused the screen to flicker
+          - listitem [ref=e51]:
+            - strong [ref=e52]: Inconsistent charging behavior
+            - text: with the MagSafe adapter
+          - listitem [ref=e53]:
+            - strong [ref=e54]: System instability
+            - text: that persisted across multiple macOS reinstalls
+        - paragraph [ref=e55]: These weren't user error issues or software glitches. These were clear hardware symptoms that any competent technician should recognize as potential power management problems.
+        - heading "Timeline of Institutional Failure" [level=2] [ref=e56]:
+          - link "Timeline of Institutional Failure" [ref=e57] [cursor=pointer]:
+            - /url: "#timeline-of-institutional-failure"
+        - 'heading "January 15, 2024: The First Contact" [level=3] [ref=e58]':
+          - 'link "January 15, 2024: The First Contact" [ref=e59] [cursor=pointer]':
+            - /url: "#january-15-2024-the-first-contact"
+        - paragraph [ref=e60]: "I initiated contact through Apple's chat support, providing all necessary information:"
+        - list [ref=e61]:
+          - listitem [ref=e62]: Serial number and purchase details
+          - listitem [ref=e63]: Comprehensive description of symptoms
+          - listitem [ref=e64]: Troubleshooting steps already attempted
+          - listitem [ref=e65]: Request for hardware diagnostic
+        - paragraph [ref=e66]: "The chat agent ran remote diagnostics, found \"no issues,\" but created case #AC-2024-██████ for follow-up. They promised someone would contact me soon."
+        - paragraph [ref=e67]: Then they disconnected from the chat.
+        - paragraph [ref=e69]:
+          - strong [ref=e70]: "Red Flag #1:"
+          - text: Remote diagnostics that can't detect intermittent hardware issues are useless, yet AppleCare treats them as definitive.
+        - 'heading "January 15-22: The Silence" [level=3] [ref=e71]':
+          - 'link "January 15-22: The Silence" [ref=e72] [cursor=pointer]':
+            - /url: "#january-15-22-the-silence"
+        - paragraph [ref=e73]: For seven days, nothing. No call, no email, no follow-up. The case that was supposedly created seemed to exist in a parallel universe where customer service actually happens.
+        - 'heading "January 22: The Phone Marathon Begins" [level=3] [ref=e74]':
+          - 'link "January 22: The Phone Marathon Begins" [ref=e75] [cursor=pointer]':
+            - /url: "#january-22-the-phone-marathon-begins"
+        - paragraph [ref=e76]: "After a week of silence, I called AppleCare directly. What followed was a 1 hour and 12 minute call where I:"
+        - list [ref=e77]:
+          - listitem [ref=e78]:
+            - strong [ref=e79]: Explained the issue again
+            - text: (no record of previous case)
+          - listitem [ref=e80]:
+            - strong [ref=e81]: Repeated all troubleshooting steps
+            - text: (agent insisted on starting over)
+          - listitem [ref=e82]:
+            - strong [ref=e83]: Provided the same device information
+            - text: (previous data apparently lost)
+          - listitem [ref=e84]:
+            - strong [ref=e85]: Requested escalation to supervisor
+            - text: (promised callback within 24 hours)
+        - paragraph [ref=e86]: The callback never came.
+        - 'heading "January 25: Escalation Theater" [level=3] [ref=e87]':
+          - 'link "January 25: Escalation Theater" [ref=e88] [cursor=pointer]':
+            - /url: "#january-25-escalation-theater"
+        - paragraph [ref=e89]: Third call, 38 minutes. Different agent, same script. This time I demanded to speak with a supervisor immediately. After 20 minutes on hold, I was told supervisors were "in meetings" but one would definitely call back.
+        - paragraph [ref=e90]: "Spoiler alert: They didn't."
+        - 'heading "January 28: The Diagnostic Revelation" [level=3] [ref=e91]':
+          - 'link "January 28: The Diagnostic Revelation" [ref=e92] [cursor=pointer]':
+            - /url: "#january-28-the-diagnostic-revelation"
+        - paragraph [ref=e93]:
+          - text: "Fourth call, 23 minutes. This agent actually ran proper diagnostics and discovered something interesting:"
+          - strong [ref=e94]: power management warnings
+          - text: "in the system logs. The diagnostic report clearly showed:"
+        - list [ref=e95]:
+          - listitem [ref=e96]: Intermittent power fluctuations
+          - listitem [ref=e97]: Voltage irregularities during operation
+          - listitem [ref=e98]: Hardware anomalies in the power management system
+          - listitem [ref=e99]:
+            - strong [ref=e100]: Recommendation for hardware inspection
+        - paragraph [ref=e101]: Finally, validation that this was a real hardware issue covered under warranty.
+        - 'heading "January 29: The Gaslighting Begins" [level=3] [ref=e102]':
+          - 'link "January 29: The Gaslighting Begins" [ref=e103] [cursor=pointer]':
+            - /url: "#january-29-the-gaslighting-begins"
+        - paragraph [ref=e104]: Instead of scheduling a repair, I received an email from a "Senior AppleCare Advisor" dismissing the diagnostic findings. According to Sarah M., the power management warnings were "within acceptable parameters" and didn't qualify for warranty coverage.
+        - paragraph [ref=e105]:
+          - text: "Let me repeat that:"
+          - strong [ref=e106]: Apple's own diagnostic tools detected hardware problems, but Apple's support team decided those problems didn't count.
+        - paragraph [ref=e108]:
+          - strong [ref=e109]: "Red Flag #2:"
+          - text: When Apple's diagnostic tools contradict Apple's support decisions, something is fundamentally broken in their process.
+        - 'heading "February 1: The Supervisor Mirage" [level=3] [ref=e110]':
+          - 'link "February 1: The Supervisor Mirage" [ref=e111] [cursor=pointer]':
+            - /url: "#february-1-the-supervisor-mirage"
+        - paragraph [ref=e112]: After demanding escalation through multiple channels, I finally reached someone claiming to be a supervisor. The 8-minute call consisted entirely of them explaining why the diagnostic warnings didn't matter and why my case would be closed.
+        - paragraph [ref=e113]: No technical explanation. No alternative solutions. Just corporate doublespeak about "acceptable parameters."
+        - 'heading "February 2: Case Closed, Customer Abandoned" [level=3] [ref=e114]':
+          - 'link "February 2: Case Closed, Customer Abandoned" [ref=e115] [cursor=pointer]':
+            - /url: "#february-2-case-closed-customer-abandoned"
+        - paragraph [ref=e116]: "The final insult arrived via automated email: my case was closed with \"no defect found.\" Despite:"
+        - list [ref=e117]:
+          - listitem [ref=e118]: Valid AppleCare+ coverage
+          - listitem [ref=e119]: Documented hardware symptoms
+          - listitem [ref=e120]: Official diagnostic warnings
+          - listitem [ref=e121]: Weeks of support attempts
+        - paragraph [ref=e122]: Apple decided the problem didn't exist.
+        - 'heading "The Evidence: A Paper Trail of Failure" [level=2] [ref=e123]':
+          - 'link "The Evidence: A Paper Trail of Failure" [ref=e124] [cursor=pointer]':
+            - /url: "#the-evidence-a-paper-trail-of-failure"
+        - paragraph [ref=e125]: Every interaction with AppleCare was documented. Below you'll find the complete evidence showing how Apple's premium support service systematically failed a paying customer with a legitimate warranty claim.
+        - paragraph [ref=e126]:
+          - emphasis [ref=e127]: "[Evidence gallery renders here with all documented communications and diagnostic reports]"
+        - heading "The Systemic Problems Revealed" [level=2] [ref=e128]:
+          - link "The Systemic Problems Revealed" [ref=e129] [cursor=pointer]:
+            - /url: "#the-systemic-problems-revealed"
+        - paragraph [ref=e130]:
+          - text: This isn't an isolated incident of one bad support agent. The evidence reveals
+          - strong [ref=e131]: systemic failures
+          - text: "in AppleCare's support infrastructure:"
+        - heading "1. Broken Case Management System" [level=3] [ref=e132]:
+          - link "1. Broken Case Management System" [ref=e133] [cursor=pointer]:
+            - /url: "#1-broken-case-management-system"
+        - list [ref=e134]:
+          - listitem [ref=e135]: Cases disappear from their system without explanation
+          - listitem [ref=e136]: No continuity between support interactions
+          - listitem [ref=e137]: Each agent starts from zero, ignoring previous work
+          - listitem [ref=e138]: Escalation requests vanish into the void
+        - heading "2. Diagnostic Tool Disconnect" [level=3] [ref=e139]:
+          - link "2. Diagnostic Tool Disconnect" [ref=e140] [cursor=pointer]:
+            - /url: "#2-diagnostic-tool-disconnect"
+        - list [ref=e141]:
+          - listitem [ref=e142]: Apple's own diagnostic tools detect hardware problems
+          - listitem [ref=e143]: Support agents dismiss their own company's diagnostic findings
+          - listitem [ref=e144]: "\"Acceptable parameters\" becomes a catch-all excuse"
+          - listitem [ref=e145]: Technical evidence is ignored in favor of case closure metrics
+        - heading "3. Escalation Theater" [level=3] [ref=e146]:
+          - link "3. Escalation Theater" [ref=e147] [cursor=pointer]:
+            - /url: "#3-escalation-theater"
+        - list [ref=e148]:
+          - listitem [ref=e149]: Supervisor callbacks that never happen
+          - listitem [ref=e150]: "\"Senior advisors\" who provide no additional expertise"
+          - listitem [ref=e151]: Escalation requests treated as customer complaints, not technical issues
+          - listitem [ref=e152]: No actual authority to resolve problems
+        - heading "4. Warranty Coverage Denial" [level=3] [ref=e153]:
+          - link "4. Warranty Coverage Denial" [ref=e154] [cursor=pointer]:
+            - /url: "#4-warranty-coverage-denial"
+        - list [ref=e155]:
+          - listitem [ref=e156]: Valid AppleCare+ coverage ignored
+          - listitem [ref=e157]: Hardware defects dismissed as "normal operation"
+          - listitem [ref=e158]: Diagnostic warnings reframed as "acceptable"
+          - listitem [ref=e159]: Premium support indistinguishable from no support
+        - heading "The Real Cost of AppleCare+ Failure" [level=2] [ref=e160]:
+          - link "The Real Cost of AppleCare+ Failure" [ref=e161] [cursor=pointer]:
+            - /url: "#the-real-cost-of-applecare-failure"
+        - paragraph [ref=e162]: "This experience cost me far more than the $199 AppleCare+ premium:"
+        - heading "Financial Impact" [level=3] [ref=e163]:
+          - link "Financial Impact" [ref=e164] [cursor=pointer]:
+            - /url: "#financial-impact"
+        - list [ref=e165]:
+          - listitem [ref=e166]:
+            - strong [ref=e167]: $199 AppleCare+ fee
+            - text: "- paid for service that wasn't delivered"
+          - listitem [ref=e168]:
+            - strong [ref=e169]: Lost productivity
+            - text: during 3+ weeks of device instability
+          - listitem [ref=e170]:
+            - strong [ref=e171]: Time cost
+            - text: "- over 3.5 hours on support calls alone"
+          - listitem [ref=e172]:
+            - strong [ref=e173]: Opportunity cost
+            - text: "- projects delayed due to unreliable hardware"
+        - heading "Professional Impact" [level=3] [ref=e174]:
+          - link "Professional Impact" [ref=e175] [cursor=pointer]:
+            - /url: "#professional-impact"
+        - list [ref=e176]:
+          - listitem [ref=e177]:
+            - strong [ref=e178]: Client work disrupted
+            - text: by random shutdowns during presentations
+          - listitem [ref=e179]:
+            - strong [ref=e180]: Data integrity concerns
+            - text: from unexpected power losses
+          - listitem [ref=e181]:
+            - strong [ref=e182]: Reputation damage
+            - text: from recommending Apple products to colleagues
+          - listitem [ref=e183]:
+            - strong [ref=e184]: Trust erosion
+            - text: in Apple's quality and support promises
+        - heading "Personal Impact" [level=3] [ref=e185]:
+          - link "Personal Impact" [ref=e186] [cursor=pointer]:
+            - /url: "#personal-impact"
+        - list [ref=e187]:
+          - listitem [ref=e188]:
+            - strong [ref=e189]: Stress and frustration
+            - text: from being gaslit about obvious hardware problems
+          - listitem [ref=e190]:
+            - strong [ref=e191]: Feeling powerless
+            - text: against corporate bureaucracy
+          - listitem [ref=e192]:
+            - strong [ref=e193]: Regret
+            - text: over choosing Apple's premium ecosystem
+          - listitem [ref=e194]:
+            - strong [ref=e195]: Cynicism
+            - text: about "customer-first" marketing claims
+        - heading "What AppleCare+ Actually Provides" [level=2] [ref=e196]:
+          - link "What AppleCare+ Actually Provides" [ref=e197] [cursor=pointer]:
+            - /url: "#what-applecare-actually-provides"
+        - paragraph [ref=e198]: "Based on this experience, here's what you're really paying for with AppleCare+:"
+        - paragraph [ref=e199]:
+          - text: ✅
+          - strong [ref=e200]: "What's Advertised:"
+        - list [ref=e201]:
+          - listitem [ref=e202]: Priority access to Apple technical support
+          - listitem [ref=e203]: Hardware repair coverage with low service fees
+          - listitem [ref=e204]: Accidental damage protection
+          - listitem [ref=e205]: Expert technical assistance
+        - paragraph [ref=e206]:
+          - text: ❌
+          - strong [ref=e207]: "What You Actually Get:"
+        - list [ref=e208]:
+          - listitem [ref=e209]: Longer wait times than free support
+          - listitem [ref=e210]: Diagnostic findings dismissed by non-technical staff
+          - listitem [ref=e211]: Warranty coverage denied for documented hardware defects
+          - listitem [ref=e212]: Automated case closure without resolution
+        - heading "The Questions Apple Won't Answer" [level=2] [ref=e213]:
+          - link "The Questions Apple Won't Answer" [ref=e214] [cursor=pointer]:
+            - /url: "#the-questions-apple-won-t-answer"
+        - paragraph [ref=e215]: "Throughout this process, I asked simple questions that AppleCare couldn't or wouldn't answer:"
+        - list [ref=e216]:
+          - listitem [ref=e217]:
+            - strong [ref=e218]: Why do your diagnostic tools show problems if there are no problems?
+          - listitem [ref=e219]:
+            - strong [ref=e220]: What constitutes "acceptable parameters" for power management warnings?
+          - listitem [ref=e221]:
+            - strong [ref=e222]: How can a hardware defect be "normal operation"?
+          - listitem [ref=e223]:
+            - strong [ref=e224]: Why does AppleCare+ coverage not cover hardware defects?
+          - listitem [ref=e225]:
+            - strong [ref=e226]: Who has authority to actually resolve technical issues?
+        - paragraph [ref=e227]: The silence on these questions is deafening.
+        - heading "For Potential AppleCare+ Customers" [level=2] [ref=e228]:
+          - link "For Potential AppleCare+ Customers" [ref=e229] [cursor=pointer]:
+            - /url: "#for-potential-applecare-customers"
+        - paragraph [ref=e230]: "Before you pay for AppleCare+, consider these realities:"
+        - heading "Ask Yourself:" [level=3] [ref=e231]:
+          - link "Ask Yourself:" [ref=e232] [cursor=pointer]:
+            - /url: "#ask-yourself"
+        - list [ref=e233]:
+          - listitem [ref=e234]:
+            - strong [ref=e235]: Can you afford device downtime
+            - text: while AppleCare ignores your case?
+          - listitem [ref=e236]:
+            - strong [ref=e237]: Are you prepared to fight
+            - text: for warranty coverage you already paid for?
+          - listitem [ref=e238]:
+            - strong [ref=e239]: Do you have time
+            - text: to become your own case manager and technical advocate?
+          - listitem [ref=e240]:
+            - strong [ref=e241]: Is premium pricing worth
+            - text: support that's worse than free alternatives?
+        - heading "Consider Alternatives:" [level=3] [ref=e242]:
+          - link "Consider Alternatives:" [ref=e243] [cursor=pointer]:
+            - /url: "#consider-alternatives"
+        - list [ref=e244]:
+          - listitem [ref=e245]:
+            - strong [ref=e246]: Credit card purchase protection
+            - text: often provides better coverage
+          - listitem [ref=e247]:
+            - strong [ref=e248]: Third-party repair services
+            - text: may be more responsive and honest
+          - listitem [ref=e249]:
+            - strong [ref=e250]: Self-repair options
+            - text: are increasingly available for Apple devices
+          - listitem [ref=e251]:
+            - strong [ref=e252]: Extended manufacturer warranties
+            - text: from other brands actually work
+        - 'heading "The Bigger Picture: Corporate Accountability" [level=2] [ref=e253]':
+          - 'link "The Bigger Picture: Corporate Accountability" [ref=e254] [cursor=pointer]':
+            - /url: "#the-bigger-picture-corporate-accountability"
+        - paragraph [ref=e255]: "This story isn't just about one frustrated customer. It's about a pattern of behavior from one of the world's most valuable companies:"
+        - heading "Apple's Support Strategy Appears to Be:" [level=3] [ref=e256]:
+          - link "Apple's Support Strategy Appears to Be:" [ref=e257] [cursor=pointer]:
+            - /url: "#apple-s-support-strategy-appears-to-be"
+        - list [ref=e258]:
+          - listitem [ref=e259]:
+            - strong [ref=e260]: Collect premium support fees
+            - text: upfront
+          - listitem [ref=e261]:
+            - strong [ref=e262]: Make support difficult to access
+            - text: (long wait times, complex processes)
+          - listitem [ref=e263]:
+            - strong [ref=e264]: Dismiss legitimate claims
+            - text: using technical-sounding excuses
+          - listitem [ref=e265]:
+            - strong [ref=e266]: Close cases without resolution
+            - text: to improve metrics
+          - listitem [ref=e267]:
+            - strong [ref=e268]: Rely on brand loyalty
+            - text: to prevent customer defection
+        - heading "The Real Question:" [level=3] [ref=e269]:
+          - link "The Real Question:" [ref=e270] [cursor=pointer]:
+            - /url: "#the-real-question"
+        - paragraph [ref=e271]:
+          - text: If Apple can't provide competent support for their own hardware using their own diagnostic tools,
+          - strong [ref=e272]: what exactly are customers paying for?
+        - 'heading "Moving Forward: Demanding Better" [level=2] [ref=e273]':
+          - 'link "Moving Forward: Demanding Better" [ref=e274] [cursor=pointer]':
+            - /url: "#moving-forward-demanding-better"
+        - paragraph [ref=e275]: "I'm sharing this story to:"
+        - list [ref=e276]:
+          - listitem [ref=e277]:
+            - strong [ref=e278]: Warn potential customers
+            - text: about AppleCare+ realities
+          - listitem [ref=e279]:
+            - strong [ref=e280]: Document Apple's support failures
+            - text: for accountability
+          - listitem [ref=e281]:
+            - strong [ref=e282]: Encourage others
+            - text: to share their experiences
+          - listitem [ref=e283]:
+            - strong [ref=e284]: Pressure Apple
+            - text: to fix their broken support system
+        - paragraph [ref=e285]: Premium support should mean premium service. When it doesn't, customers deserve to know.
+        - heading "Your Turn" [level=2] [ref=e286]:
+          - link "Your Turn" [ref=e287] [cursor=pointer]:
+            - /url: "#your-turn"
+        - paragraph [ref=e288]:
+          - text: If you've experienced similar issues with AppleCare,
+          - strong [ref=e289]: your story matters
+          - text: . Share your experience in the comments below. Document everything. Hold Apple accountable.
+        - paragraph [ref=e290]: Together, we can demand the support quality that matches the premium prices we pay.
+        - separator [ref=e291]
+        - paragraph [ref=e292]:
+          - emphasis [ref=e293]: Have you been robbed by AppleCare too? Share your story and help others make informed decisions about Apple's premium support service.
+      - generic [ref=e294]:
+        - heading "Evidence" [level=2] [ref=e295]
+        - generic [ref=e296]:
+          - heading "Evidence" [level=2] [ref=e297]
+          - generic [ref=e298]:
+            - generic [ref=e299] [cursor=pointer]:
+              - generic [ref=e300] [cursor=pointer]:
+                - generic [ref=e301] [cursor=pointer]:
+                  - generic [ref=e303] [cursor=pointer]: Loading...
+                  - img "Screenshot of Apple's coverage verification showing active AppleCare+ until 2026" [ref=e304] [cursor=pointer]
+                - img [ref=e306] [cursor=pointer]
+              - paragraph [ref=e309] [cursor=pointer]: Valid AppleCare+ coverage confirmed at time of issue
+            - generic [ref=e310] [cursor=pointer]:
+              - generic [ref=e311] [cursor=pointer]:
+                - generic [ref=e312] [cursor=pointer]:
+                  - generic [ref=e314] [cursor=pointer]: Loading...
+                  - img "Screenshot of AppleCare chat session showing agent disconnect after case creation" [ref=e315] [cursor=pointer]
+                - img [ref=e317] [cursor=pointer]
+              - paragraph [ref=e320] [cursor=pointer]: Initial chat support - agent creates case then disconnects
+            - generic [ref=e321] [cursor=pointer]:
+              - generic [ref=e322] [cursor=pointer]:
+                - generic [ref=e323] [cursor=pointer]:
+                  - generic [ref=e325] [cursor=pointer]: Loading...
+                  - img "Screenshot of initial AppleCare support email with response time commitment" [ref=e326] [cursor=pointer]
+                - img [ref=e328] [cursor=pointer]
+              - paragraph [ref=e331] [cursor=pointer]: Initial support email promising 24-48 hour response
+            - generic [ref=e332] [cursor=pointer]:
+              - generic [ref=e333] [cursor=pointer]:
+                - generic [ref=e336] [cursor=pointer]: Loading...
+                - img [ref=e338] [cursor=pointer]
+              - paragraph [ref=e341] [cursor=pointer]: Phone call log showing 3+ hours spent on support calls
+            - generic [ref=e342] [cursor=pointer]:
+              - generic [ref=e343] [cursor=pointer]:
+                - generic [ref=e346] [cursor=pointer]: Loading...
+                - img [ref=e348] [cursor=pointer]
+              - paragraph [ref=e351] [cursor=pointer]: Official Apple diagnostic showing hardware defect - ignored by support
+            - generic [ref=e352] [cursor=pointer]:
+              - generic [ref=e353] [cursor=pointer]:
+                - generic [ref=e356] [cursor=pointer]: Loading...
+                - img [ref=e358] [cursor=pointer]
+              - paragraph [ref=e361] [cursor=pointer]: Escalation to supervisor team - dismissal of valid warranty claim
+            - generic [ref=e362] [cursor=pointer]:
+              - generic [ref=e363] [cursor=pointer]:
+                - generic [ref=e366] [cursor=pointer]: Loading...
+                - img [ref=e368] [cursor=pointer]
+              - paragraph [ref=e371] [cursor=pointer]: Senior advisor email dismissing hardware defect as 'normal'
+            - generic [ref=e372] [cursor=pointer]:
+              - generic [ref=e373] [cursor=pointer]:
+                - generic [ref=e376] [cursor=pointer]: Loading...
+                - img [ref=e378] [cursor=pointer]
+              - paragraph [ref=e381] [cursor=pointer]: Automated case closure without resolution or explanation
+      - generic [ref=e382]:
+        - heading "Timeline" [level=2] [ref=e383]:
+          - link "Timeline" [ref=e384] [cursor=pointer]:
+            - /url: "#timeline"
+        - generic [ref=e385]:
+          - generic [ref=e386]:
+            - 'heading "Day 1: Initial Contact" [level=3] [ref=e387]'
+            - paragraph [ref=e388]: First contact with AppleCare support
+          - generic [ref=e389]:
+            - 'heading "Day 7: First Escalation" [level=3] [ref=e390]'
+            - paragraph [ref=e391]: Escalated to supervisor level
+          - generic [ref=e392]:
+            - 'heading "Day 14: The Runaround" [level=3] [ref=e393]'
+            - paragraph [ref=e394]: Multiple transfers and repeated explanations
+          - generic [ref=e395]:
+            - 'heading "Day 21: Case Closed" [level=3] [ref=e396]'
+            - paragraph [ref=e397]: Case closed without resolution
+      - generic [ref=e398]:
+        - heading "Discussion" [level=2] [ref=e399]:
+          - link "Discussion" [ref=e400] [cursor=pointer]:
+            - /url: "#comments"
+        - paragraph [ref=e401]: Share your experiences and join the conversation below. You can log in with Google or Facebook to participate.
+        - region "Comments section" [ref=e402]:
+          - generic [ref=e403]:
+            - heading "Discussion" [level=2] [ref=e404]:
+              - link "Discussion" [ref=e405] [cursor=pointer]:
+                - /url: "#comments"
+            - paragraph [ref=e406]: Share your experiences and join the conversation below. You can log in with Google or Facebook to participate.
+          - generic [ref=e410]: Loading comments...
+      - generic [ref=e412]:
+        - paragraph [ref=e413]: "Last updated: 9/1/2025"
+        - generic [ref=e414]:
+          - heading "Share this article" [level=3] [ref=e415]
+          - generic [ref=e416]:
+            - heading "Share this article" [level=3] [ref=e417]
+            - generic [ref=e418]:
+              - button "Share on Twitter" [ref=e419] [cursor=pointer]:
+                - img [ref=e420] [cursor=pointer]
+                - generic [ref=e422] [cursor=pointer]: Twitter
+              - button "Share on Facebook" [ref=e423] [cursor=pointer]:
+                - img [ref=e424] [cursor=pointer]
+                - generic [ref=e426] [cursor=pointer]: Facebook
+              - button "Share on LinkedIn" [ref=e427] [cursor=pointer]:
+                - img [ref=e428] [cursor=pointer]
+                - generic [ref=e430] [cursor=pointer]: LinkedIn
+              - button "Share on Reddit" [ref=e431] [cursor=pointer]:
+                - img [ref=e432] [cursor=pointer]
+                - generic [ref=e434] [cursor=pointer]: Reddit
+    - button "Back to top" [ref=e435] [cursor=pointer]: ↑
+```

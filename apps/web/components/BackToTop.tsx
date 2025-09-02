@@ -2,7 +2,11 @@
 
 import { useState, useEffect } from 'react';
 
-export default function BackToTop() {
+interface BackToTopProps {
+  'data-testid'?: string;
+}
+
+export default function BackToTop({ 'data-testid': dataTestId }: BackToTopProps = {}) {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -33,7 +37,7 @@ export default function BackToTop() {
         onClick={scrollToTop}
         className="fixed bottom-8 right-8 btn btn-primary rounded-full w-12 h-12 shadow-lg hover:shadow-xl transition-all duration-200 z-40 opacity-50"
         aria-label="Back to top"
-        data-testid="back-to-top"
+        data-testid={dataTestId || "back-to-top"}
       >
         ↑
       </button>
@@ -45,7 +49,7 @@ export default function BackToTop() {
       onClick={scrollToTop}
       className="fixed bottom-8 right-8 btn btn-primary rounded-full w-12 h-12 shadow-lg hover:shadow-xl transition-all duration-200 z-40"
       aria-label="Back to top"
-      data-testid="back-to-top"
+      data-testid={dataTestId || "back-to-top"}
     >
       ↑
     </button>

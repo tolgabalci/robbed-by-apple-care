@@ -22,7 +22,9 @@ mockPerformanceObserver.mockReturnValue({
   observe: () => null,
   disconnect: () => null,
 });
-window.PerformanceObserver = mockPerformanceObserver;
+const MockPerformanceObserverClass = mockPerformanceObserver as any;
+MockPerformanceObserverClass.supportedEntryTypes = ['navigation', 'measure', 'paint'];
+(window as any).PerformanceObserver = MockPerformanceObserverClass;
 
 describe('Performance Optimizations', () => {
   describe('LazyImage Component', () => {
@@ -85,14 +87,14 @@ describe('Performance Optimizations', () => {
 
     it('should set up performance observers in production', () => {
       const originalEnv = process.env.NODE_ENV;
-      process.env.NODE_ENV = 'production';
+      (process.env as any).NODE_ENV = 'production';
 
       render(<PerformanceMonitor />);
 
       // Should attempt to set up PerformanceObserver
       expect(mockPerformanceObserver).toHaveBeenCalled();
 
-      process.env.NODE_ENV = originalEnv;
+      (process.env as any).NODE_ENV = originalEnv;
     });
   });
 

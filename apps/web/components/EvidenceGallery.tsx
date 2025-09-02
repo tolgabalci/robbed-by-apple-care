@@ -6,6 +6,7 @@ import LazyImage from './LazyImage';
 
 interface EvidenceGalleryProps {
   evidence: EvidenceItem[];
+  'data-testid'?: string;
 }
 
 interface LightboxProps {
@@ -147,7 +148,7 @@ function Lightbox({ isOpen, currentIndex, evidence, onClose, onNext, onPrevious 
   );
 }
 
-export default function EvidenceGallery({ evidence }: EvidenceGalleryProps) {
+export default function EvidenceGallery({ evidence, 'data-testid': dataTestId }: EvidenceGalleryProps) {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -173,7 +174,7 @@ export default function EvidenceGallery({ evidence }: EvidenceGalleryProps) {
   }
 
   return (
-    <div className="my-12" data-testid="evidence-gallery">
+    <div className="my-12" data-testid={dataTestId}>
       <h2 className="text-2xl font-bold mb-6 text-gray-900">Evidence</h2>
       
       {/* Gallery Grid */}
@@ -183,6 +184,7 @@ export default function EvidenceGallery({ evidence }: EvidenceGalleryProps) {
             key={index}
             className="group cursor-pointer bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-200"
             onClick={() => openLightbox(index)}
+            data-testid={`evidence-${index}`}
           >
             <div className="relative aspect-video bg-gray-100 flex items-center justify-center">
               {item.type === 'image' ? (

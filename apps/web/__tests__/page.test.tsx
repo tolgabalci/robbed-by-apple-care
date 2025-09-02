@@ -42,7 +42,15 @@ jest.mock('../components/ui', () => ({
   Badge: ({ children, variant }: { children: React.ReactNode; variant: string }) => (
     <span data-testid="badge" data-variant={variant}>{children}</span>
   ),
-  ThemeToggle: () => <button data-testid="theme-toggle">Toggle Theme</button>,
+  ThemeToggle: () => (
+    <button 
+      data-testid="theme-toggle" 
+      aria-label="Switch to dark mode"
+      title="Switch to dark mode"
+    >
+      <svg><path /></svg>
+    </button>
+  ),
 }));
 
 // Mock MDXRemote to avoid issues in test environment
@@ -194,6 +202,8 @@ describe('Article Component', () => {
       render(<Article article={mockArticle} />);
       const themeToggle = screen.getByTestId('theme-toggle');
       expect(themeToggle).toBeInTheDocument();
+      expect(themeToggle).toHaveAttribute('aria-label');
+      expect(themeToggle).toHaveAttribute('title');
     });
 
     it('renders back to top button', () => {

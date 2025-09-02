@@ -3,9 +3,10 @@
 interface SocialShareProps {
   title: string;
   url: string;
+  'data-testid'?: string;
 }
 
-export default function SocialShare({ title, url }: SocialShareProps) {
+export default function SocialShare({ title, url, 'data-testid': dataTestId }: SocialShareProps) {
   const encodedTitle = encodeURIComponent(title);
   const encodedUrl = encodeURIComponent(url);
 
@@ -53,7 +54,7 @@ export default function SocialShare({ title, url }: SocialShareProps) {
   };
 
   return (
-    <div className="my-8 p-6 bg-gray-50 dark:bg-gray-800 rounded-lg" data-testid="social-share">
+    <div className="my-8 p-6 bg-gray-50 dark:bg-gray-800 rounded-lg" data-testid={dataTestId}>
       <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">
         Share this article
       </h3>

@@ -52,6 +52,30 @@ export default function RootLayout({
         {/* Discourse prefetch for better performance */}
         <link rel="dns-prefetch" href="//forum.robbedbyapplecare.com" />
         <link rel="preconnect" href="https://forum.robbedbyapplecare.com" crossOrigin="anonymous" />
+        {/* Theme initialization script to prevent FOUC */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var theme = localStorage.getItem('theme');
+                  var systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                  
+                  if (theme === 'dark' || (!theme && systemPrefersDark)) {
+                    document.documentElement.classList.add('dark');
+                  } else {
+                    document.documentElement.classList.remove('dark');
+                  }
+                } catch (e) {
+                  // Fallback for when localStorage is not available
+                  if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    document.documentElement.classList.add('dark');
+                  }
+                }
+              })();
+            `,
+          }}
+        />
       </head>
       <body className={inter.className}>
         <PerformanceMonitor />

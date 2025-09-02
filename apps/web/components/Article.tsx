@@ -54,7 +54,7 @@ export default function Article({ article }: ArticleProps) {
                     </a>
                   ))}
                 </div>
-                <ThemeToggle />
+                <ThemeToggle data-testid="theme-toggle" />
               </div>
             </div>
           </div>
@@ -178,25 +178,62 @@ export default function Article({ article }: ArticleProps) {
 
         {/* Evidence Gallery */}
         {frontmatter.evidence && frontmatter.evidence.length > 0 && (
-          <EvidenceGallery evidence={frontmatter.evidence} />
+          <section id="evidence">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">Evidence</h2>
+            <EvidenceGallery evidence={frontmatter.evidence} data-testid="evidence-gallery" />
+          </section>
         )}
+
+        {/* Timeline Section */}
+        <section id="timeline" className="mb-12">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">
+            <a href="#timeline" className="hover:underline">Timeline</a>
+          </h2>
+          <div className="space-y-6">
+            <div className="border-l-4 border-red-500 pl-4">
+              <h3 className="font-semibold text-gray-900 dark:text-gray-100">Day 1: Initial Contact</h3>
+              <p className="text-gray-600 dark:text-gray-400">First contact with AppleCare support</p>
+            </div>
+            <div className="border-l-4 border-orange-500 pl-4">
+              <h3 className="font-semibold text-gray-900 dark:text-gray-100">Day 7: First Escalation</h3>
+              <p className="text-gray-600 dark:text-gray-400">Escalated to supervisor level</p>
+            </div>
+            <div className="border-l-4 border-yellow-500 pl-4">
+              <h3 className="font-semibold text-gray-900 dark:text-gray-100">Day 14: The Runaround</h3>
+              <p className="text-gray-600 dark:text-gray-400">Multiple transfers and repeated explanations</p>
+            </div>
+            <div className="border-l-4 border-red-600 pl-4">
+              <h3 className="font-semibold text-gray-900 dark:text-gray-100">Day 21: Case Closed</h3>
+              <p className="text-gray-600 dark:text-gray-400">Case closed without resolution</p>
+            </div>
+          </div>
+        </section>
 
 
 
         {/* Discourse Comments */}
-        <DiscourseEmbed 
-          discourseUrl="https://forum.robbedbyapplecare.com"
-          className="mt-12"
-        />
+        <section id="comments" className="mt-12">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">
+            <a href="#comments" className="hover:underline">Discussion</a>
+          </h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-6">
+            Share your experiences and join the conversation below. You can log in with Google or Facebook to participate.
+          </p>
+          <DiscourseEmbed 
+            discourseUrl="https://forum.robbedbyapplecare.com"
+          />
+        </section>
 
         {/* Article Footer */}
         <footer className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
           <div className="text-center text-gray-500 dark:text-gray-400 text-sm">
             <p>Last updated: {new Date(metadata.lastModified).toLocaleDateString()}</p>
             <div className="mt-6">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Share this article</h3>
               <SocialShare 
                 url={frontmatter.canonicalUrl}
                 title={frontmatter.title}
+                data-testid="social-share"
               />
             </div>
           </div>
@@ -204,7 +241,7 @@ export default function Article({ article }: ArticleProps) {
       </article>
 
       {/* Back to top button */}
-      <BackToTop />
+      <BackToTop data-testid="back-to-top" />
     </div>
   );
 }
