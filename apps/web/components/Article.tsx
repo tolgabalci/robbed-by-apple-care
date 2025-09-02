@@ -212,23 +212,16 @@ export default function Article({ article }: ArticleProps) {
 
 
         {/* Discourse Comments */}
-        <section id="comments" className="mt-12">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">
-            <a href="#comments" className="hover:underline">Discussion</a>
-          </h2>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">
-            Share your experiences and join the conversation below. You can log in with Google or Facebook to participate.
-          </p>
-          <DiscourseEmbed 
-            discourseUrl="https://forum.robbedbyapplecare.com"
-          />
-        </section>
+        <DiscourseEmbed 
+          discourseUrl="https://forum.robbedbyapplecare.com"
+          className="mt-12"
+        />
 
         {/* Article Footer */}
         <footer className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
           <div className="text-center text-gray-500 dark:text-gray-400 text-sm">
             <p>Last updated: {new Date(metadata.lastModified).toLocaleDateString()}</p>
-            <div className="mt-6">
+            <div className="mt-6 flex flex-col items-center">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Share this article</h3>
               <SocialShare 
                 url={frontmatter.canonicalUrl}

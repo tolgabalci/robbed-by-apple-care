@@ -58,7 +58,7 @@ export default function SocialShare({ title, url, 'data-testid': dataTestId }: S
       <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">
         Share this article
       </h3>
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap justify-center gap-3">
         {shareLinks.map((link) => (
           <button
             key={link.name}
