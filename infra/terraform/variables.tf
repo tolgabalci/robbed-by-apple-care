@@ -22,11 +22,7 @@ variable "admin_username" {
   default     = "azureuser"
 }
 
-variable "environment" {
-  description = "Environment name"
-  type        = string
-  default     = "prod"
-}
+
 
 variable "ssh_public_key" {
   description = "SSH public key for VM access"
