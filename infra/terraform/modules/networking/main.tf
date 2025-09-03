@@ -99,9 +99,9 @@ resource "azurerm_cdn_frontdoor_origin" "static_site" {
   host_name                      = var.static_web_app_hostname
   http_port                      = 80
   https_port                     = 443
-  origin_host_header            = var.static_web_app_hostname
-  priority                      = 1
-  weight                        = 1000
+  origin_host_header             = var.static_web_app_hostname
+  priority                       = 1
+  weight                         = 1000
   certificate_name_check_enabled = true
 }
 
@@ -114,9 +114,9 @@ resource "azurerm_cdn_frontdoor_origin" "discourse" {
   host_name                      = var.discourse_vm_hostname
   http_port                      = 80
   https_port                     = 443
-  origin_host_header            = var.discourse_vm_hostname
-  priority                      = 1
-  weight                        = 1000
+  origin_host_header             = var.discourse_vm_hostname
+  priority                       = 1
+  weight                         = 1000
   certificate_name_check_enabled = true
 }
 
@@ -165,7 +165,7 @@ resource "azurerm_cdn_frontdoor_route" "www" {
     query_string_caching_behavior = "IgnoreQueryString"
     query_strings                 = []
     compression_enabled           = true
-    content_types_to_compress     = [
+    content_types_to_compress = [
       "application/eot",
       "application/font",
       "application/font-sfnt",
@@ -230,7 +230,7 @@ resource "azurerm_cdn_frontdoor_route" "forum" {
     query_string_caching_behavior = "UseQueryString"
     query_strings                 = []
     compression_enabled           = true
-    content_types_to_compress     = [
+    content_types_to_compress = [
       "application/javascript",
       "application/json",
       "application/xml",
