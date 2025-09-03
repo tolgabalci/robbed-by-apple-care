@@ -165,7 +165,7 @@ resource "azurerm_cdn_frontdoor_route" "www" {
     query_string_caching_behavior = "IgnoreQueryString"
     query_strings                 = []
     compression_enabled           = true
-    content_types_to_compress = [
+    content_types_to_compress     = [
       "application/eot",
       "application/font",
       "application/font-sfnt",
@@ -230,7 +230,7 @@ resource "azurerm_cdn_frontdoor_route" "forum" {
     query_string_caching_behavior = "UseQueryString"
     query_strings                 = []
     compression_enabled           = true
-    content_types_to_compress = [
+    content_types_to_compress     = [
       "application/javascript",
       "application/json",
       "application/xml",
