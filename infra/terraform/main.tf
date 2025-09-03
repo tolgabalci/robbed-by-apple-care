@@ -22,6 +22,7 @@ provider "azurerm" {
   
   # Use service principal authentication for GitHub Actions
   use_cli = false
+  use_msi = false
 }
 
 # Resource Group
