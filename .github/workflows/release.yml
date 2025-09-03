@@ -145,6 +145,11 @@ jobs:
       id: plan
       run: |
         ENV="${{ github.event.inputs.environment || 'prod' }}"
+        echo "Current directory: $(pwd)"
+        echo "Files in current directory:"
+        ls -la
+        echo "Files in environments directory:"
+        ls -la environments/
         terraform plan \
           -var-file="environments/${ENV}.tfvars" \
           -out=tfplan \
