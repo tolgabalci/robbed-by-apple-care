@@ -119,15 +119,19 @@ resource "azurerm_network_security_group" "postgresql" {
 }
 
 # Public IP for VM
+# NOTE: In production, this should be removed and replaced with a bastion host or VPN
+# for enhanced security. Public IPs on VMs are flagged by security scanners.
 resource "azurerm_public_ip" "vm" {
   name                = "pip-discourse-vm"
   resource_group_name = var.resource_group_name
-  location           = var.location
+  location            = var.location
   allocation_method   = "Static"
-  sku                = "Standard"
-  zones              = ["1"]
+  sku                 = "Standard"
+  zones               = ["1"]
 
-  tags = var.tags
+  tags = merge(var.tags, {
+    SecurityNote = "PublicIP-ConsiderBastionHost"
+  })
 }
 
 # Network Interface for VM
@@ -266,6 +270,23 @@ resource "azurerm_postgresql_flexible_server_database" "discourse" {
   charset   = "utf8"
 }
 
+# Private Endpoint for PostgreSQL
+resource "azurerm_private_endpoint" "postgresql" {
+  name                = "pe-postgresql-discourse"
+  location            = var.location
+  resource_group_name = var.resource_group_name
+  subnet_id           = azurerm_subnet.postgresql.id
+
+  private_service_connection {
+    name                           = "psc-postgresql-discourse"
+    private_connection_resource_id = azurerm_postgresql_flexible_server.main.id
+    subresource_names              = ["postgresqlServer"]
+    is_manual_connection           = false
+  }
+
+  tags = var.tags
+}
+
 # PostgreSQL Firewall Rule (allow VM subnet)
 resource "azurerm_postgresql_flexible_server_firewall_rule" "vm_subnet" {
   name             = "AllowVMSubnet"
@@ -296,13 +317,41 @@ resource "azurerm_storage_account" "discourse" {
   allow_nested_items_to_be_public = false
   shared_access_key_enabled       = true
 
-  # Network access
+  # Enable soft delete for blobs
+  blob_properties {
+    delete_retention_policy {
+      days = 7
+    }
+  }
+
+  # SAS expiration policy
+  sas_policy {
+    expiration_period = "01.00:00:00"
+  }
+
+  # Network access - restrict to private endpoints only
   network_rules {
-    default_action             = "Allow"
+    default_action             = "Deny"
     virtual_network_subnet_ids = [azurerm_subnet.vm.id]
+    bypass                     = ["AzureServices"]
   }
 
   tags = var.tags
+}
+
+# Storage Account Logging
+resource "azurerm_storage_account_blob_properties" "discourse" {
+  storage_account_id = azurerm_storage_account.discourse.id
+
+  logging {
+    delete                = true
+    read                  = true
+    write                 = true
+    version               = "1.0"
+    retention_policy_days = 7
+  }
+
+  depends_on = [azurerm_storage_account.discourse]
 }
 
 # Container for Discourse uploads
@@ -310,6 +359,8 @@ resource "azurerm_storage_container" "uploads" {
   name                  = "discourse-uploads"
   storage_account_name  = azurerm_storage_account.discourse.name
   container_access_type = "private"
+
+  depends_on = [azurerm_storage_account_blob_properties.discourse]
 }
 
 # Container for Discourse backups
@@ -317,6 +368,8 @@ resource "azurerm_storage_container" "backups" {
   name                  = "discourse-backups"
   storage_account_name  = azurerm_storage_account.discourse.name
   container_access_type = "private"
+
+  depends_on = [azurerm_storage_account_blob_properties.discourse]
 }
 
 # Storage Account Access Key (for S3-compatible access)
@@ -324,6 +377,23 @@ data "azurerm_storage_account" "discourse" {
   name                = azurerm_storage_account.discourse.name
   resource_group_name = var.resource_group_name
   depends_on          = [azurerm_storage_account.discourse]
+}
+
+# Private Endpoint for Storage Account
+resource "azurerm_private_endpoint" "storage" {
+  name                = "pe-storage-discourse"
+  location            = var.location
+  resource_group_name = var.resource_group_name
+  subnet_id           = azurerm_subnet.vm.id
+
+  private_service_connection {
+    name                           = "psc-storage-discourse"
+    private_connection_resource_id = azurerm_storage_account.discourse.id
+    subresource_names              = ["blob"]
+    is_manual_connection           = false
+  }
+
+  tags = var.tags
 }
 
 resource "random_string" "storage_suffix" {
