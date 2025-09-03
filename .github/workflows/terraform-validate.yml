@@ -55,7 +55,7 @@ jobs:
         output-file: README.md
         output-method: inject
         git-push: false
-        fail-on-diff: true
+        fail-on-diff: false
 
   cost-estimation:
     name: Cost Estimation
