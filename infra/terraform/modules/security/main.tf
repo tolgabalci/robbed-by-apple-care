@@ -77,9 +77,11 @@ resource "azurerm_key_vault_access_policy" "vm_identity" {
 
 # PostgreSQL admin password secret
 resource "azurerm_key_vault_secret" "postgresql_admin_password" {
-  name         = "postgresql-admin-password"
-  value        = var.postgresql_admin_password
-  key_vault_id = azurerm_key_vault.main.id
+  name            = "postgresql-admin-password"
+  value           = var.postgresql_admin_password
+  key_vault_id    = azurerm_key_vault.main.id
+  content_type    = "password"
+  expiration_date = timeadd(timestamp(), "8760h") # 1 year from now
 
   depends_on = [azurerm_key_vault_access_policy.terraform]
 
@@ -90,9 +92,11 @@ resource "azurerm_key_vault_secret" "postgresql_admin_password" {
 resource "azurerm_key_vault_secret" "storage_access_key" {
   count = var.storage_account_access_key != null ? 1 : 0
 
-  name         = "storage-account-access-key"
-  value        = var.storage_account_access_key
-  key_vault_id = azurerm_key_vault.main.id
+  name            = "storage-account-access-key"
+  value           = var.storage_account_access_key
+  key_vault_id    = azurerm_key_vault.main.id
+  content_type    = "access-key"
+  expiration_date = timeadd(timestamp(), "8760h") # 1 year from now
 
   depends_on = [azurerm_key_vault_access_policy.terraform]
 
@@ -103,9 +107,11 @@ resource "azurerm_key_vault_secret" "storage_access_key" {
 resource "azurerm_key_vault_secret" "google_oauth_client_id" {
   count = var.google_oauth_client_id != null ? 1 : 0
 
-  name         = "google-oauth-client-id"
-  value        = var.google_oauth_client_id
-  key_vault_id = azurerm_key_vault.main.id
+  name            = "google-oauth-client-id"
+  value           = var.google_oauth_client_id
+  key_vault_id    = azurerm_key_vault.main.id
+  content_type    = "oauth-client-id"
+  expiration_date = timeadd(timestamp(), "8760h") # 1 year from now
 
   depends_on = [azurerm_key_vault_access_policy.terraform]
 
@@ -116,9 +122,11 @@ resource "azurerm_key_vault_secret" "google_oauth_client_id" {
 resource "azurerm_key_vault_secret" "google_oauth_client_secret" {
   count = var.google_oauth_client_secret != null ? 1 : 0
 
-  name         = "google-oauth-client-secret"
-  value        = var.google_oauth_client_secret
-  key_vault_id = azurerm_key_vault.main.id
+  name            = "google-oauth-client-secret"
+  value           = var.google_oauth_client_secret
+  key_vault_id    = azurerm_key_vault.main.id
+  content_type    = "oauth-client-secret"
+  expiration_date = timeadd(timestamp(), "8760h") # 1 year from now
 
   depends_on = [azurerm_key_vault_access_policy.terraform]
 
@@ -129,9 +137,11 @@ resource "azurerm_key_vault_secret" "google_oauth_client_secret" {
 resource "azurerm_key_vault_secret" "facebook_oauth_app_id" {
   count = var.facebook_oauth_app_id != null ? 1 : 0
 
-  name         = "facebook-oauth-app-id"
-  value        = var.facebook_oauth_app_id
-  key_vault_id = azurerm_key_vault.main.id
+  name            = "facebook-oauth-app-id"
+  value           = var.facebook_oauth_app_id
+  key_vault_id    = azurerm_key_vault.main.id
+  content_type    = "oauth-app-id"
+  expiration_date = timeadd(timestamp(), "8760h") # 1 year from now
 
   depends_on = [azurerm_key_vault_access_policy.terraform]
 
@@ -142,9 +152,11 @@ resource "azurerm_key_vault_secret" "facebook_oauth_app_id" {
 resource "azurerm_key_vault_secret" "facebook_oauth_app_secret" {
   count = var.facebook_oauth_app_secret != null ? 1 : 0
 
-  name         = "facebook-oauth-app-secret"
-  value        = var.facebook_oauth_app_secret
-  key_vault_id = azurerm_key_vault.main.id
+  name            = "facebook-oauth-app-secret"
+  value           = var.facebook_oauth_app_secret
+  key_vault_id    = azurerm_key_vault.main.id
+  content_type    = "oauth-app-secret"
+  expiration_date = timeadd(timestamp(), "8760h") # 1 year from now
 
   depends_on = [azurerm_key_vault_access_policy.terraform]
 
@@ -155,9 +167,11 @@ resource "azurerm_key_vault_secret" "facebook_oauth_app_secret" {
 resource "azurerm_key_vault_secret" "smtp_server" {
   count = var.smtp_server != null ? 1 : 0
 
-  name         = "smtp-server"
-  value        = var.smtp_server
-  key_vault_id = azurerm_key_vault.main.id
+  name            = "smtp-server"
+  value           = var.smtp_server
+  key_vault_id    = azurerm_key_vault.main.id
+  content_type    = "smtp-server"
+  expiration_date = timeadd(timestamp(), "8760h") # 1 year from now
 
   depends_on = [azurerm_key_vault_access_policy.terraform]
 
@@ -168,9 +182,11 @@ resource "azurerm_key_vault_secret" "smtp_server" {
 resource "azurerm_key_vault_secret" "smtp_username" {
   count = var.smtp_username != null ? 1 : 0
 
-  name         = "smtp-username"
-  value        = var.smtp_username
-  key_vault_id = azurerm_key_vault.main.id
+  name            = "smtp-username"
+  value           = var.smtp_username
+  key_vault_id    = azurerm_key_vault.main.id
+  content_type    = "smtp-username"
+  expiration_date = timeadd(timestamp(), "8760h") # 1 year from now
 
   depends_on = [azurerm_key_vault_access_policy.terraform]
 
@@ -181,9 +197,11 @@ resource "azurerm_key_vault_secret" "smtp_username" {
 resource "azurerm_key_vault_secret" "smtp_password" {
   count = var.smtp_password != null ? 1 : 0
 
-  name         = "smtp-password"
-  value        = var.smtp_password
-  key_vault_id = azurerm_key_vault.main.id
+  name            = "smtp-password"
+  value           = var.smtp_password
+  key_vault_id    = azurerm_key_vault.main.id
+  content_type    = "smtp-password"
+  expiration_date = timeadd(timestamp(), "8760h") # 1 year from now
 
   depends_on = [azurerm_key_vault_access_policy.terraform]
 
@@ -194,9 +212,11 @@ resource "azurerm_key_vault_secret" "smtp_password" {
 resource "azurerm_key_vault_secret" "discourse_admin_api_key" {
   count = var.discourse_admin_api_key != null ? 1 : 0
 
-  name         = "discourse-admin-api-key"
-  value        = var.discourse_admin_api_key
-  key_vault_id = azurerm_key_vault.main.id
+  name            = "discourse-admin-api-key"
+  value           = var.discourse_admin_api_key
+  key_vault_id    = azurerm_key_vault.main.id
+  content_type    = "api-key"
+  expiration_date = timeadd(timestamp(), "8760h") # 1 year from now
 
   depends_on = [azurerm_key_vault_access_policy.terraform]
 
