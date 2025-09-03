@@ -21,7 +21,7 @@ provider "azurerm" {
   use_msi = false
 }
 
-# Resource Group
+# Main Resource Group for RobbedByAppleCare Infrastructure
 resource "azurerm_resource_group" "main" {
   name     = var.resource_group_name
   location = var.location
