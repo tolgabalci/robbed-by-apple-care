@@ -339,28 +339,13 @@ resource "azurerm_storage_account" "discourse" {
   tags = var.tags
 }
 
-# Storage Account Logging
-resource "azurerm_storage_account_blob_properties" "discourse" {
-  storage_account_id = azurerm_storage_account.discourse.id
-
-  logging {
-    delete                = true
-    read                  = true
-    write                 = true
-    version               = "1.0"
-    retention_policy_days = 7
-  }
-
-  depends_on = [azurerm_storage_account.discourse]
-}
+# Storage Account Logging (configured within storage account)
 
 # Container for Discourse uploads
 resource "azurerm_storage_container" "uploads" {
   name                  = "discourse-uploads"
   storage_account_name  = azurerm_storage_account.discourse.name
   container_access_type = "private"
-
-  depends_on = [azurerm_storage_account_blob_properties.discourse]
 }
 
 # Container for Discourse backups
@@ -368,8 +353,6 @@ resource "azurerm_storage_container" "backups" {
   name                  = "discourse-backups"
   storage_account_name  = azurerm_storage_account.discourse.name
   container_access_type = "private"
-
-  depends_on = [azurerm_storage_account_blob_properties.discourse]
 }
 
 # Storage Account Access Key (for S3-compatible access)
