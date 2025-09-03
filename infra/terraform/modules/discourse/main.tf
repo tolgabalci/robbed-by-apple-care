@@ -315,7 +315,7 @@ resource "azurerm_storage_account" "discourse" {
 
   # Security settings
   allow_nested_items_to_be_public = false
-  shared_access_key_enabled       = true  # Required for S3-compatible access by Discourse
+  shared_access_key_enabled       = true # Required for S3-compatible access by Discourse
 
   # Enable soft delete for blobs
   blob_properties {
