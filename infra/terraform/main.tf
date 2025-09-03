@@ -19,6 +19,9 @@ provider "azurerm" {
       recover_soft_deleted_key_vaults = true
     }
   }
+  
+  # Use service principal authentication for GitHub Actions
+  use_cli = false
 }
 
 # Resource Group
