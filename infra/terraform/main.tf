@@ -19,7 +19,7 @@ provider "azurerm" {
       recover_soft_deleted_key_vaults = true
     }
   }
-  
+
   # Use service principal authentication for GitHub Actions
   use_cli = false
   use_msi = false
@@ -36,36 +36,36 @@ resource "azurerm_resource_group" "main" {
 # Modules
 module "networking" {
   source = "./modules/networking"
-  
+
   resource_group_name = azurerm_resource_group.main.name
-  location           = azurerm_resource_group.main.location
-  domain_name        = var.domain_name
-  tags              = var.tags
+  location            = azurerm_resource_group.main.location
+  domain_name         = var.domain_name
+  tags                = var.tags
 }
 
 module "static_site" {
   source = "./modules/static-site"
-  
+
   resource_group_name = azurerm_resource_group.main.name
-  location           = azurerm_resource_group.main.location
-  domain_name        = var.domain_name
-  tags              = var.tags
+  location            = azurerm_resource_group.main.location
+  domain_name         = var.domain_name
+  tags                = var.tags
 }
 
 module "discourse" {
   source = "./modules/discourse"
-  
+
   resource_group_name = azurerm_resource_group.main.name
-  location           = azurerm_resource_group.main.location
-  domain_name        = var.domain_name
-  admin_username     = var.admin_username
-  tags              = var.tags
+  location            = azurerm_resource_group.main.location
+  domain_name         = var.domain_name
+  admin_username      = var.admin_username
+  tags                = var.tags
 }
 
 module "security" {
   source = "./modules/security"
-  
+
   resource_group_name = azurerm_resource_group.main.name
-  location           = azurerm_resource_group.main.location
-  tags              = var.tags
+  location            = azurerm_resource_group.main.location
+  tags                = var.tags
 }

@@ -2,7 +2,7 @@
 resource "azurerm_virtual_network" "main" {
   name                = "vnet-discourse"
   address_space       = ["10.0.0.0/16"]
-  location           = var.location
+  location            = var.location
   resource_group_name = var.resource_group_name
 
   tags = var.tags
@@ -38,7 +38,7 @@ resource "azurerm_subnet" "postgresql" {
 # Network Security Group for VM
 resource "azurerm_network_security_group" "vm" {
   name                = "nsg-discourse-vm"
-  location           = var.location
+  location            = var.location
   resource_group_name = var.resource_group_name
 
   # SSH access (restrict to specific IPs in production)
@@ -99,7 +99,7 @@ resource "azurerm_network_security_group" "vm" {
 # Network Security Group for PostgreSQL
 resource "azurerm_network_security_group" "postgresql" {
   name                = "nsg-discourse-postgresql"
-  location           = var.location
+  location            = var.location
   resource_group_name = var.resource_group_name
 
   # PostgreSQL access from VM subnet only
@@ -133,7 +133,7 @@ resource "azurerm_public_ip" "vm" {
 # Network Interface for VM
 resource "azurerm_network_interface" "vm" {
   name                = "nic-discourse-vm"
-  location           = var.location
+  location            = var.location
   resource_group_name = var.resource_group_name
 
   ip_configuration {
@@ -162,7 +162,7 @@ resource "azurerm_subnet_network_security_group_association" "postgresql" {
 resource "azurerm_user_assigned_identity" "vm" {
   name                = "id-discourse-vm"
   resource_group_name = var.resource_group_name
-  location           = var.location
+  location            = var.location
 
   tags = var.tags
 }
@@ -171,10 +171,10 @@ resource "azurerm_user_assigned_identity" "vm" {
 resource "azurerm_linux_virtual_machine" "main" {
   name                = "vm-discourse"
   resource_group_name = var.resource_group_name
-  location           = var.location
-  size               = "Standard_D2s_v5"
-  admin_username     = var.admin_username
-  zone               = "1"
+  location            = var.location
+  size                = "Standard_D2s_v5"
+  admin_username      = var.admin_username
+  zone                = "1"
 
   disable_password_authentication = true
 
@@ -234,19 +234,19 @@ resource "azurerm_private_dns_zone_virtual_network_link" "postgresql" {
 
 # PostgreSQL Flexible Server
 resource "azurerm_postgresql_flexible_server" "main" {
-  name                   = "psql-discourse-${random_string.db_suffix.result}"
-  resource_group_name    = var.resource_group_name
-  location              = var.location
-  version               = "14"
-  delegated_subnet_id    = azurerm_subnet.postgresql.id
-  private_dns_zone_id    = azurerm_private_dns_zone.postgresql.id
-  administrator_login    = "discourse_admin"
-  administrator_password = var.postgresql_admin_password
-  zone                  = "1"
-  storage_mb            = 32768
-  sku_name              = "B_Standard_B1ms"
-  
-  backup_retention_days = 7
+  name                         = "psql-discourse-${random_string.db_suffix.result}"
+  resource_group_name          = var.resource_group_name
+  location                     = var.location
+  version                      = "14"
+  delegated_subnet_id          = azurerm_subnet.postgresql.id
+  private_dns_zone_id          = azurerm_private_dns_zone.postgresql.id
+  administrator_login          = "discourse_admin"
+  administrator_password       = var.postgresql_admin_password
+  zone                         = "1"
+  storage_mb                   = 32768
+  sku_name                     = "B_Standard_B1ms"
+
+  backup_retention_days        = 7
   geo_redundant_backup_enabled = false
 
   high_availability {
@@ -284,18 +284,18 @@ resource "random_string" "db_suffix" {
 resource "azurerm_storage_account" "discourse" {
   name                     = "stdiscourse${random_string.storage_suffix.result}"
   resource_group_name      = var.resource_group_name
-  location                = var.location
-  account_tier            = "Standard"
+  location                 = var.location
+  account_tier             = "Standard"
   account_replication_type = "LRS"
-  account_kind            = "StorageV2"
-  
+  account_kind             = "StorageV2"
+
   # Enable S3-compatible access
   is_hns_enabled = false
-  
+
   # Security settings
   allow_nested_items_to_be_public = false
   shared_access_key_enabled       = true
-  
+
   # Network access
   network_rules {
     default_action             = "Allow"
@@ -323,7 +323,7 @@ resource "azurerm_storage_container" "backups" {
 data "azurerm_storage_account" "discourse" {
   name                = azurerm_storage_account.discourse.name
   resource_group_name = var.resource_group_name
-  depends_on         = [azurerm_storage_account.discourse]
+  depends_on          = [azurerm_storage_account.discourse]
 }
 
 resource "random_string" "storage_suffix" {

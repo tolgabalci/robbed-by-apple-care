@@ -4,18 +4,18 @@ data "azurerm_client_config" "current" {}
 # Key Vault
 resource "azurerm_key_vault" "main" {
   name                = "kv-robbedbyapplecare-${random_string.kv_suffix.result}"
-  location           = var.location
+  location            = var.location
   resource_group_name = var.resource_group_name
-  tenant_id          = data.azurerm_client_config.current.tenant_id
-  sku_name           = "standard"
-  
+  tenant_id           = data.azurerm_client_config.current.tenant_id
+  sku_name            = "standard"
+
   # Security settings
   enabled_for_disk_encryption     = true
   enabled_for_deployment          = false
   enabled_for_template_deployment = true
   purge_protection_enabled        = true
   soft_delete_retention_days      = 7
-  
+
   # Network access
   network_acls {
     default_action = "Allow"
@@ -64,7 +64,7 @@ resource "azurerm_key_vault_access_policy" "terraform" {
 # Access policy for VM Managed Identity
 resource "azurerm_key_vault_access_policy" "vm_identity" {
   count = var.vm_managed_identity_principal_id != null ? 1 : 0
-  
+
   key_vault_id = azurerm_key_vault.main.id
   tenant_id    = data.azurerm_client_config.current.tenant_id
   object_id    = var.vm_managed_identity_principal_id
@@ -89,7 +89,7 @@ resource "azurerm_key_vault_secret" "postgresql_admin_password" {
 # Storage account access key secret
 resource "azurerm_key_vault_secret" "storage_access_key" {
   count = var.storage_account_access_key != null ? 1 : 0
-  
+
   name         = "storage-account-access-key"
   value        = var.storage_account_access_key
   key_vault_id = azurerm_key_vault.main.id
@@ -102,7 +102,7 @@ resource "azurerm_key_vault_secret" "storage_access_key" {
 # Google OAuth client ID secret
 resource "azurerm_key_vault_secret" "google_oauth_client_id" {
   count = var.google_oauth_client_id != null ? 1 : 0
-  
+
   name         = "google-oauth-client-id"
   value        = var.google_oauth_client_id
   key_vault_id = azurerm_key_vault.main.id
@@ -115,7 +115,7 @@ resource "azurerm_key_vault_secret" "google_oauth_client_id" {
 # Google OAuth client secret
 resource "azurerm_key_vault_secret" "google_oauth_client_secret" {
   count = var.google_oauth_client_secret != null ? 1 : 0
-  
+
   name         = "google-oauth-client-secret"
   value        = var.google_oauth_client_secret
   key_vault_id = azurerm_key_vault.main.id
@@ -128,7 +128,7 @@ resource "azurerm_key_vault_secret" "google_oauth_client_secret" {
 # Facebook OAuth app ID secret
 resource "azurerm_key_vault_secret" "facebook_oauth_app_id" {
   count = var.facebook_oauth_app_id != null ? 1 : 0
-  
+
   name         = "facebook-oauth-app-id"
   value        = var.facebook_oauth_app_id
   key_vault_id = azurerm_key_vault.main.id
@@ -141,7 +141,7 @@ resource "azurerm_key_vault_secret" "facebook_oauth_app_id" {
 # Facebook OAuth app secret
 resource "azurerm_key_vault_secret" "facebook_oauth_app_secret" {
   count = var.facebook_oauth_app_secret != null ? 1 : 0
-  
+
   name         = "facebook-oauth-app-secret"
   value        = var.facebook_oauth_app_secret
   key_vault_id = azurerm_key_vault.main.id
@@ -154,7 +154,7 @@ resource "azurerm_key_vault_secret" "facebook_oauth_app_secret" {
 # SMTP server configuration secret
 resource "azurerm_key_vault_secret" "smtp_server" {
   count = var.smtp_server != null ? 1 : 0
-  
+
   name         = "smtp-server"
   value        = var.smtp_server
   key_vault_id = azurerm_key_vault.main.id
@@ -167,7 +167,7 @@ resource "azurerm_key_vault_secret" "smtp_server" {
 # SMTP username secret
 resource "azurerm_key_vault_secret" "smtp_username" {
   count = var.smtp_username != null ? 1 : 0
-  
+
   name         = "smtp-username"
   value        = var.smtp_username
   key_vault_id = azurerm_key_vault.main.id
@@ -180,7 +180,7 @@ resource "azurerm_key_vault_secret" "smtp_username" {
 # SMTP password secret
 resource "azurerm_key_vault_secret" "smtp_password" {
   count = var.smtp_password != null ? 1 : 0
-  
+
   name         = "smtp-password"
   value        = var.smtp_password
   key_vault_id = azurerm_key_vault.main.id
@@ -193,7 +193,7 @@ resource "azurerm_key_vault_secret" "smtp_password" {
 # Discourse admin API key (generated after Discourse setup)
 resource "azurerm_key_vault_secret" "discourse_admin_api_key" {
   count = var.discourse_admin_api_key != null ? 1 : 0
-  
+
   name         = "discourse-admin-api-key"
   value        = var.discourse_admin_api_key
   key_vault_id = azurerm_key_vault.main.id

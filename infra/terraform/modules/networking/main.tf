@@ -2,7 +2,7 @@
 resource "azurerm_cdn_frontdoor_profile" "main" {
   name                = "fd-robbedbyapplecare"
   resource_group_name = var.resource_group_name
-  sku_name           = "Standard_AzureFrontDoor"
+  sku_name            = "Standard_AzureFrontDoor"
 
   tags = var.tags
 }
@@ -19,9 +19,9 @@ resource "azurerm_dns_zone" "main" {
 resource "azurerm_cdn_frontdoor_firewall_policy" "main" {
   name                = "wafrobbedbyapplecare"
   resource_group_name = var.resource_group_name
-  sku_name           = azurerm_cdn_frontdoor_profile.main.sku_name
-  enabled            = true
-  mode               = "Prevention"
+  sku_name            = azurerm_cdn_frontdoor_profile.main.sku_name
+  enabled             = true
+  mode                = "Prevention"
 
   managed_rule {
     type    = "DefaultRuleSet"
@@ -124,8 +124,8 @@ resource "azurerm_cdn_frontdoor_origin" "discourse" {
 resource "azurerm_cdn_frontdoor_custom_domain" "www" {
   name                     = "www-robbedbyapplecare-com"
   cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.main.id
-  dns_zone_id             = azurerm_dns_zone.main.id
-  host_name               = "www.${var.domain_name}"
+  dns_zone_id              = azurerm_dns_zone.main.id
+  host_name                = "www.${var.domain_name}"
 
   tls {
     certificate_type    = "ManagedCertificate"
@@ -137,8 +137,8 @@ resource "azurerm_cdn_frontdoor_custom_domain" "www" {
 resource "azurerm_cdn_frontdoor_custom_domain" "forum" {
   name                     = "forum-robbedbyapplecare-com"
   cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.main.id
-  dns_zone_id             = azurerm_dns_zone.main.id
-  host_name               = "forum.${var.domain_name}"
+  dns_zone_id              = azurerm_dns_zone.main.id
+  host_name                = "forum.${var.domain_name}"
 
   tls {
     certificate_type    = "ManagedCertificate"
@@ -154,17 +154,17 @@ resource "azurerm_cdn_frontdoor_route" "www" {
   cdn_frontdoor_origin_ids      = [azurerm_cdn_frontdoor_origin.static_site.id]
 
   supported_protocols    = ["Http", "Https"]
-  patterns_to_match     = ["/*"]
-  forwarding_protocol   = "HttpsOnly"
+  patterns_to_match      = ["/*"]
+  forwarding_protocol    = "HttpsOnly"
   link_to_default_domain = true
 
   cdn_frontdoor_custom_domain_ids = [azurerm_cdn_frontdoor_custom_domain.www.id]
-  cdn_frontdoor_rule_set_ids     = []
+  cdn_frontdoor_rule_set_ids      = []
 
   cache {
     query_string_caching_behavior = "IgnoreQueryString"
-    query_strings                = []
-    compression_enabled          = true
+    query_strings                 = []
+    compression_enabled           = true
     content_types_to_compress = [
       "application/eot",
       "application/font",
@@ -219,17 +219,17 @@ resource "azurerm_cdn_frontdoor_route" "forum" {
   cdn_frontdoor_origin_ids      = [azurerm_cdn_frontdoor_origin.discourse.id]
 
   supported_protocols    = ["Http", "Https"]
-  patterns_to_match     = ["/*"]
-  forwarding_protocol   = "HttpsOnly"
+  patterns_to_match      = ["/*"]
+  forwarding_protocol    = "HttpsOnly"
   link_to_default_domain = true
 
   cdn_frontdoor_custom_domain_ids = [azurerm_cdn_frontdoor_custom_domain.forum.id]
-  cdn_frontdoor_rule_set_ids     = []
+  cdn_frontdoor_rule_set_ids      = []
 
   cache {
     query_string_caching_behavior = "UseQueryString"
-    query_strings                = []
-    compression_enabled          = true
+    query_strings                 = []
+    compression_enabled           = true
     content_types_to_compress = [
       "application/javascript",
       "application/json",

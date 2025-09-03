@@ -2,12 +2,12 @@
 resource "azurerm_static_site" "main" {
   name                = "swa-robbedbyapplecare"
   resource_group_name = var.resource_group_name
-  location           = var.location
-  sku_tier           = "Standard"
-  sku_size           = "Standard"
+  location            = var.location
+  sku_tier            = "Standard"
+  sku_size            = "Standard"
 
   app_settings = {
-    "NEXT_PUBLIC_SITE_URL" = "https://www.${var.domain_name}"
+    "NEXT_PUBLIC_SITE_URL"  = "https://www.${var.domain_name}"
     "NEXT_PUBLIC_FORUM_URL" = "https://forum.${var.domain_name}"
   }
 
@@ -32,9 +32,9 @@ resource "azurerm_static_site_deployment_slot" "staging" {
   static_site_id = azurerm_static_site.main.id
 
   app_settings = {
-    "NEXT_PUBLIC_SITE_URL" = "https://staging-www.${var.domain_name}"
+    "NEXT_PUBLIC_SITE_URL"  = "https://staging-www.${var.domain_name}"
     "NEXT_PUBLIC_FORUM_URL" = "https://forum.${var.domain_name}"
-    "ENVIRONMENT" = "staging"
+    "ENVIRONMENT"           = "staging"
   }
 
   tags = var.tags
