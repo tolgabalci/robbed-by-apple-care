@@ -28,6 +28,24 @@ variable "environment" {
   default     = "prod"
 }
 
+variable "ssh_public_key" {
+  description = "SSH public key for VM access"
+  type        = string
+  sensitive   = true
+}
+
+variable "postgresql_admin_password" {
+  description = "Admin password for PostgreSQL"
+  type        = string
+  sensitive   = true
+}
+
+variable "ssh_source_address_prefix" {
+  description = "Source address prefix for SSH access"
+  type        = string
+  default     = "*"
+}
+
 variable "tags" {
   description = "Tags to apply to all resources"
   type        = map(string)
