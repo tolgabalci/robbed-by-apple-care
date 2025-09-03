@@ -315,7 +315,7 @@ resource "azurerm_storage_account" "discourse" {
 
   # Security settings
   allow_nested_items_to_be_public = false
-  shared_access_key_enabled       = false
+  shared_access_key_enabled       = true  # Required for S3-compatible access by Discourse
 
   # Enable soft delete for blobs
   blob_properties {
@@ -339,18 +339,8 @@ resource "azurerm_storage_account" "discourse" {
   tags = var.tags
 }
 
-# Storage account logging configuration
-resource "azurerm_storage_account_blob_service_properties" "discourse_logging" {
-  storage_account_id = azurerm_storage_account.discourse.id
-
-  logging {
-    delete                = true
-    read                  = true
-    write                 = true
-    version               = "1.0"
-    retention_policy_days = 7
-  }
-}
+# Note: Storage logging for compliance is typically configured at the 
+# subscription level or requires a separate Log Analytics workspace
 
 # Storage Account Logging (configured within storage account)
 
