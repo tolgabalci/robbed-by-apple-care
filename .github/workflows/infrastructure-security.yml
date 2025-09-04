@@ -52,16 +52,17 @@ jobs:
         sarif_file: reports/checkov-results.sarif
     
     - name: Run TFSec
+      uses: aquasecurity/tfsec-action@v1.0.3
+      with:
+        working_directory: ./infra/terraform
+        format: sarif
+        sarif_file: reports/tfsec-results.sarif
+        soft_fail: true
+      continue-on-error: true
+    
+    - name: Ensure TFSec SARIF file exists
       run: |
         mkdir -p reports
-        docker run --rm -v $(pwd):/src --workdir /src \
-          aquasec/tfsec:latest \
-          --format sarif \
-          --out reports/tfsec-results.sarif \
-          --soft-fail \
-          ./infra/terraform || true
-        
-        # Ensure the file exists even if TFSec fails
         if [ ! -f "./reports/tfsec-results.sarif" ]; then
           echo '{"version":"2.1.0","$schema":"https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json","runs":[{"tool":{"driver":{"name":"TFSec","version":"unknown"}},"results":[]}]}' > ./reports/tfsec-results.sarif
         fi
@@ -73,15 +74,17 @@ jobs:
         sarif_file: reports/tfsec-results.sarif
     
     - name: Run Trivy IaC scan
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'config'
+        scan-ref: './infra/terraform'
+        format: 'sarif'
+        output: 'reports/trivy-iac-results.sarif'
+      continue-on-error: true
+    
+    - name: Ensure Trivy IaC SARIF file exists
       run: |
         mkdir -p reports
-        docker run --rm -v $(pwd):/src --workdir /src \
-          aquasec/trivy:latest config \
-          --format sarif \
-          --output reports/trivy-iac-results.sarif \
-          ./infra/terraform || true
-        
-        # Ensure the file exists even if Trivy fails
         if [ ! -f "./reports/trivy-iac-results.sarif" ]; then
           echo '{"version":"2.1.0","$schema":"https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json","runs":[{"tool":{"driver":{"name":"Trivy","version":"unknown"}},"results":[]}]}' > ./reports/trivy-iac-results.sarif
         fi
@@ -101,15 +104,17 @@ jobs:
       uses: actions/checkout@v4
     
     - name: Run Trivy Docker scan
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: './apps/forum-provisioning'
+        format: 'sarif'
+        output: 'reports/trivy-docker-results.sarif'
+      continue-on-error: true
+    
+    - name: Ensure Trivy Docker SARIF file exists
       run: |
         mkdir -p reports
-        docker run --rm -v $(pwd):/src --workdir /src \
-          aquasec/trivy:latest fs \
-          --format sarif \
-          --output reports/trivy-docker-results.sarif \
-          ./apps/forum-provisioning || true
-        
-        # Ensure the file exists even if Trivy fails
         if [ ! -f "./reports/trivy-docker-results.sarif" ]; then
           echo '{"version":"2.1.0","$schema":"https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json","runs":[{"tool":{"driver":{"name":"Trivy","version":"unknown"}},"results":[]}]}' > ./reports/trivy-docker-results.sarif
         fi
