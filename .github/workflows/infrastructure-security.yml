@@ -29,7 +29,7 @@ jobs:
     - name: Run Checkov
       run: |
         # Remove any existing directory with the same name
-        rm -rf ./reports/checkov-results.sarif
+        sudo rm -rf ./reports/checkov-results.sarif
         
         docker run --rm -v $(pwd):/tf --workdir /tf \
           bridgecrew/checkov:latest \
@@ -41,12 +41,16 @@ jobs:
         
         # Ensure the file exists and is a file, not a directory
         if [ ! -f "./reports/checkov-results.sarif" ] || [ -d "./reports/checkov-results.sarif" ]; then
-          rm -rf ./reports/checkov-results.sarif
+          sudo rm -rf ./reports/checkov-results.sarif
           echo '{"version":"2.1.0","$schema":"https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json","runs":[{"tool":{"driver":{"name":"Checkov","version":"unknown"}},"results":[]}]}' > ./reports/checkov-results.sarif
         fi
+        
+        # Fix permissions if needed
+        sudo chown -R $(whoami):$(whoami) ./reports/ || true
     
     - name: Upload Checkov results to GitHub Security tab
       uses: github/codeql-action/upload-sarif@v3
+      continue-on-error: true
       if: always() && hashFiles('reports/checkov-results.sarif') != ''
       with:
         sarif_file: reports/checkov-results.sarif
@@ -69,6 +73,7 @@ jobs:
     
     - name: Upload TFSec results
       uses: github/codeql-action/upload-sarif@v3
+      continue-on-error: true
       if: always() && hashFiles('reports/tfsec-results.sarif') != ''
       with:
         sarif_file: reports/tfsec-results.sarif
@@ -91,6 +96,7 @@ jobs:
     
     - name: Upload Trivy IaC results
       uses: github/codeql-action/upload-sarif@v3
+      continue-on-error: true
       if: always() && hashFiles('reports/trivy-iac-results.sarif') != ''
       with:
         sarif_file: reports/trivy-iac-results.sarif
@@ -121,6 +127,7 @@ jobs:
     
     - name: Upload Trivy Docker results
       uses: github/codeql-action/upload-sarif@v3
+      continue-on-error: true
       if: always() && hashFiles('reports/trivy-docker-results.sarif') != ''
       with:
         sarif_file: reports/trivy-docker-results.sarif

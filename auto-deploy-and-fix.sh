@@ -187,7 +187,7 @@ deploy_changes() {
     if [ -f "infra/terraform/deploy.sh" ]; then
         echo "🚀 Running Terraform deployment..."
         cd infra/terraform
-        ./deploy.sh
+        ./deploy.sh plan prod
         cd ../..
     fi
 }
