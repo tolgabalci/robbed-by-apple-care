@@ -210,13 +210,24 @@ jobs:
     
     - name: Check for Drift
       run: |
+        set +e  # Don't exit on error
         terraform plan -detailed-exitcode -no-color \
           -var="ssh_public_key=${{ secrets.SSH_PUBLIC_KEY }}" \
           -var="postgresql_admin_password=${{ secrets.POSTGRESQL_ADMIN_PASSWORD }}"
-        if [ $? -eq 2 ]; then
+        PLAN_EXIT_CODE=$?
+        
+        if [ $PLAN_EXIT_CODE -eq 0 ]; then
+          echo "✅ No infrastructure drift detected." >> $GITHUB_STEP_SUMMARY
+        elif [ $PLAN_EXIT_CODE -eq 2 ]; then
           echo "⚠️ Infrastructure drift detected!" >> $GITHUB_STEP_SUMMARY
           echo "Resources have changed outside of Terraform." >> $GITHUB_STEP_SUMMARY
           echo "Consider creating a release to apply changes." >> $GITHUB_STEP_SUMMARY
         else
-          echo "✅ No infrastructure drift detected." >> $GITHUB_STEP_SUMMARY
+          echo "⚠️ Drift detection failed due to permissions or other issues." >> $GITHUB_STEP_SUMMARY
+          echo "This may indicate Azure permissions need to be updated." >> $GITHUB_STEP_SUMMARY
+          echo "Exit code: $PLAN_EXIT_CODE" >> $GITHUB_STEP_SUMMARY
         fi
+        
+        # Always succeed - drift detection should not block the workflow
+        exit 0
+      continue-on-error: true
