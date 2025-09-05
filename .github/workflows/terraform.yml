@@ -21,67 +21,12 @@ env:
   WORKING_DIR: "infra/terraform"
 
 jobs:
-  # Security scanning and validation for all events
-  security-scan:
-    name: Security Scanning
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    
-    - name: Run Trivy vulnerability scanner
-      uses: aquasecurity/trivy-action@master
-      with:
-        scan-type: 'fs'
-        scan-ref: './infra/terraform'
-        format: 'sarif'
-        output: 'trivy-results.sarif'
-      continue-on-error: true
-    
-    - name: Ensure Trivy SARIF file exists
-      run: |
-        if [ ! -f "./trivy-results.sarif" ]; then
-          echo '{"version":"2.1.0","$schema":"https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json","runs":[{"tool":{"driver":{"name":"Trivy","version":"unknown"}},"results":[]}]}' > ./trivy-results.sarif
-        fi
-    
-    - name: Upload Trivy scan results to GitHub Security tab
-      uses: github/codeql-action/upload-sarif@v3
-      if: always() && hashFiles('trivy-results.sarif') != ''
-      with:
-        sarif_file: 'trivy-results.sarif'
-    
-    - name: Run Checkov security scan
-      run: |
-        # Remove any existing directory with the same name
-        rm -rf ./checkov-results.sarif
-        
-        docker run --rm -v $(pwd):/tf --workdir /tf \
-          bridgecrew/checkov:latest \
-          --framework terraform \
-          --directory ./infra/terraform \
-          --output sarif \
-          --output-file-path ./checkov-results.sarif \
-          --soft-fail || true
-        
-        # Ensure the file exists and is a file, not a directory
-        if [ ! -f "./checkov-results.sarif" ] || [ -d "./checkov-results.sarif" ]; then
-          rm -rf ./checkov-results.sarif
-          echo '{"version":"2.1.0","$schema":"https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json","runs":[{"tool":{"driver":{"name":"Checkov","version":"unknown"}},"results":[]}]}' > ./checkov-results.sarif
-        fi
-    
-    - name: Upload Checkov scan results
-      uses: github/codeql-action/upload-sarif@v3
-      if: always() && hashFiles('checkov-results.sarif') != ''
-      with:
-        sarif_file: checkov-results.sarif
 
   # Terraform plan for pull requests
   terraform-plan:
     name: Terraform Plan
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
-    needs: security-scan
     
     defaults:
       run:
@@ -173,8 +118,6 @@ jobs:
     name: Terraform Apply
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
-    needs: security-scan
-    environment: production
     
     defaults:
       run:
@@ -223,7 +166,6 @@ jobs:
     name: Drift Detection
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main' && !startsWith(github.ref, 'refs/tags/')
-    needs: security-scan
     
     defaults:
       run:

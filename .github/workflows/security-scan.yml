@@ -1,0 +1,74 @@
+name: Security Scanning
+
+on:
+  push:
+    paths: [ 'infra/**' ]
+  pull_request:
+    paths: [ 'infra/**' ]
+  schedule:
+    # Run security scans daily at 2 AM UTC
+    - cron: '0 2 * * *'
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+jobs:
+  security-scan:
+    name: Infrastructure Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Create reports directory
+      run: mkdir -p reports
+    
+    - name: Run Checkov
+      run: |
+        echo "Running Checkov security scan..."
+        docker run --rm -v $(pwd):/tf --workdir /tf \
+          bridgecrew/checkov:latest \
+          --framework terraform \
+          --directory ./infra/terraform \
+          --output sarif \
+          --output-file-path ./reports/checkov-results.sarif \
+          --soft-fail || echo "Checkov scan completed"
+        
+        # Ensure we have a valid SARIF file
+        if [ ! -f "./reports/checkov-results.sarif" ]; then
+          echo '{"version":"2.1.0","runs":[{"tool":{"driver":{"name":"Checkov"}},"results":[]}]}' > ./reports/checkov-results.sarif
+        fi
+      continue-on-error: true
+    
+    - name: Upload Checkov results
+      uses: github/codeql-action/upload-sarif@v3
+      continue-on-error: true
+      if: always()
+      with:
+        sarif_file: reports/checkov-results.sarif
+    
+    - name: Run Trivy IaC scan
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'config'
+        scan-ref: './infra/terraform'
+        format: 'sarif'
+        output: 'reports/trivy-iac-results.sarif'
+      continue-on-error: true
+    
+    - name: Upload Trivy IaC results
+      uses: github/codeql-action/upload-sarif@v3
+      continue-on-error: true
+      if: always()
+      with:
+        sarif_file: reports/trivy-iac-results.sarif
+    
+    - name: Security Scan Summary
+      run: |
+        echo "## Security Scan Complete" >> $GITHUB_STEP_SUMMARY
+        echo "Security findings have been uploaded to the Security tab." >> $GITHUB_STEP_SUMMARY
+        echo "This scan does not block deployments." >> $GITHUB_STEP_SUMMARY
+      if: always()
